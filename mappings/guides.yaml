@@ -1,0 +1,109 @@
+wowhead:
+  death_knight:
+    blood: https://www.wowhead.com/guide/classes/death-knight/blood/overview-pve-tank
+    frost: https://www.wowhead.com/guide/classes/death-knight/frost/overview-pve-dps
+    unholy: https://www.wowhead.com/guide/classes/death-knight/unholy/overview-pve-dps
+  demon_hunter:
+    devourer: # needs to be updated as soon as available
+    havoc: https://www.wowhead.com/guide/classes/death-knight/unholy/overview-pve-dps
+    Vengeance: https://www.wowhead.com/guide/classes/demon-hunter/vengeance/overview-pve-tank
+  druid:
+    balance: https://www.wowhead.com/guide/classes/druid/balance/overview-pve-dps
+    feral: https://www.wowhead.com/guide/classes/druid/balance/overview-pve-dps
+    guardian: https://www.wowhead.com/guide/classes/druid/guardian/overview-pve-tank
+    restoration: https://www.wowhead.com/guide/classes/druid/restoration/overview-pve-healer
+  evoker:
+    augmentation: https://www.wowhead.com/guide/classes/evoker/augmentation/overview-pve-dps
+    devestation: https://www.wowhead.com/guide/classes/evoker/devastation/overview-pve-dps
+    preservation: https://www.wowhead.com/guide/classes/evoker/preservation/overview-pve-healer
+  hunter:
+    beast_mastery: https://www.wowhead.com/guide/classes/hunter/beast-mastery/overview-pve-dps
+    marksmanship: https://www.wowhead.com/guide/classes/hunter/marksmanship/overview-pve-dps
+    survival: https://www.wowhead.com/guide/classes/hunter/survival/overview-pve-dps
+  mage:
+    arcane: https://www.wowhead.com/guide/classes/mage/arcane/overview-pve-dps
+    fire: https://www.wowhead.com/guide/classes/mage/fire/overview-pve-dps
+    frost: https://www.wowhead.com/guide/classes/mage/frost/overview-pve-dps
+  monk:
+    brewmaster: https://www.wowhead.com/guide/classes/monk/brewmaster/overview-pve-tank
+    mistweaver: https://www.wowhead.com/guide/classes/monk/mistweaver/overview-pve-healer
+    windwalker: https://www.wowhead.com/guide/classes/monk/windwalker/overview-pve-dps
+  paladin:
+    holy: https://www.wowhead.com/guide/classes/paladin/holy/overview-pve-healer
+    protection: https://www.wowhead.com/guide/classes/paladin/protection/overview-pve-tank
+    retribution: https://www.wowhead.com/guide/classes/paladin/retribution/overview-pve-dps
+  priest:
+    discipline: https://www.wowhead.com/guide/classes/priest/discipline/overview-pve-healer
+    holy: https://www.wowhead.com/guide/classes/priest/holy/overview-pve-healer
+    shadow: https://www.wowhead.com/guide/classes/priest/shadow/overview-pve-dps
+  rouge:
+    assassionation: https://www.wowhead.com/guide/classes/rogue/assassination/overview-pve-dps
+    outlaw: https://www.wowhead.com/guide/classes/rogue/outlaw/overview-pve-dps
+    subtlety: https://www.wowhead.com/guide/classes/rogue/outlaw/overview-pve-dps
+  shaman:
+    elemental: https://www.wowhead.com/guide/classes/shaman/elemental/overview-pve-dps
+    enhancement: https://www.wowhead.com/guide/classes/shaman/enhancement/overview-pve-dps
+    restoration: https://www.wowhead.com/guide/classes/shaman/restoration/overview-pve-healer
+  warlock:
+    affliction: https://www.wowhead.com/guide/classes/warlock/affliction/overview-pve-dps
+    demonology: https://www.wowhead.com/guide/classes/warlock/demonology/overview-pve-dps
+    destruction: https://www.wowhead.com/guide/classes/warlock/destruction/overview-pve-dps
+  warrior:
+    arms: https://www.wowhead.com/guide/classes/warrior/arms/overview-pve-dps
+    fury: https://www.wowhead.com/guide/classes/warrior/fury/overview-pve-dps
+    protection: https://www.wowhead.com/guide/classes/warrior/protection/overview-pve-tank
+
+icy_veins:
+  death_knight:
+    blood: https://www.icy-veins.com/wow/blood-death-knight-pve-tank-guide
+    frost: https://www.icy-veins.com/wow/frost-death-knight-pve-dps-guide
+    unholy: https://www.icy-veins.com/wow/unholy-death-knight-pve-dps-guide
+  demon_hunter:
+    devourer: https://www.icy-veins.com/wow/devourer-demon-hunter-pve-dps-guide
+    havoc: https://www.icy-veins.com/wow/havoc-demon-hunter-pve-dps-guide
+    vengeance: https://www.icy-veins.com/wow/vengeance-demon-hunter-pve-tank-guide
+  druid:
+    balance: https://www.icy-veins.com/wow/balance-druid-pve-dps-guide
+    feral: https://www.icy-veins.com/wow/balance-druid-pve-dps-guide
+    guardian: https://www.icy-veins.com/wow/guardian-druid-pve-tank-guide
+    restoration: https://www.icy-veins.com/wow/restoration-druid-pve-healing-guide
+  evoker:
+    augmentation: https://www.icy-veins.com/wow/augmentation-evoker-pve-dps-guide
+    devestation: https://www.icy-veins.com/wow/devastation-evoker-pve-dps-guide
+    preservation: https://www.icy-veins.com/wow/preservation-evoker-pve-healing-guide
+  hunter:
+    beast_mastery: https://www.icy-veins.com/wow/beast-mastery-hunter-pve-dps-guide
+    marksmanship: https://www.icy-veins.com/wow/marksmanship-hunter-pve-dps-guide
+    survival: https://www.icy-veins.com/wow/survival-hunter-pve-dps-guide
+  mage:
+    arcane: https://www.icy-veins.com/wow/arcane-mage-pve-dps-guide
+    fire: https://www.icy-veins.com/wow/fire-mage-pve-dps-guide
+    frost: https://www.icy-veins.com/wow/frost-mage-pve-dps-guide
+  monk:
+    brewmaster: https://www.icy-veins.com/wow/brewmaster-monk-pve-tank-guide
+    mistweaver: https://www.icy-veins.com/wow/mistweaver-monk-pve-healing-guide
+    windwalker: https://www.icy-veins.com/wow/windwalker-monk-pve-dps-guide
+  paladin:
+    holy: https://www.icy-veins.com/wow/holy-paladin-pve-healing-guide
+    protection: https://www.icy-veins.com/wow/protection-paladin-pve-tank-guide
+    retribution: https://www.icy-veins.com/wow/retribution-paladin-pve-dps-guide
+  priest:
+    discipline: https://www.icy-veins.com/wow/discipline-priest-pve-healing-guide
+    holy: https://www.icy-veins.com/wow/holy-priest-pve-healing-guide
+    shadow: https://www.icy-veins.com/wow/shadow-priest-pve-dps-guide
+  rouge:
+    assassionation: https://www.icy-veins.com/wow/assassination-rogue-pve-dps-guide
+    outlaw: https://www.icy-veins.com/wow/outlaw-rogue-pve-dps-guide
+    subtlety: https://www.icy-veins.com/wow/subtlety-rogue-pve-dps-guide
+  shaman:
+    elemental: https://www.icy-veins.com/wow/elemental-shaman-pve-dps-guide
+    enhancement: https://www.icy-veins.com/wow/enhancement-shaman-pve-dps-guide
+    restoration: https://www.icy-veins.com/wow/restoration-shaman-pve-healing-guide
+  warlock:
+    affliction: https://www.icy-veins.com/wow/affliction-warlock-pve-dps-guide
+    demonology: https://www.icy-veins.com/wow/demonology-warlock-pve-dps-guide
+    destruction: https://www.icy-veins.com/wow/destruction-warlock-pve-dps-guide
+  warrior:
+    arms: https://www.icy-veins.com/wow/arms-warrior-pve-dps-guide
+    fury: https://www.icy-veins.com/wow/fury-warrior-pve-dps-guide
+    protection: https://www.icy-veins.com/wow/protection-warrior-pve-tank-guide

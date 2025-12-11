@@ -1,0 +1,26 @@
+bosses:
+  # ToDo: regarding mythictrap; maybe better solutiun we will see.
+  plexus:
+    name: Plexus Sentinel
+    url: https://www.mythictrap.com/de/manaforge-omega/plexus-sentinel
+  loom:
+    name: Loom'ithar
+    url: https://www.mythictrap.com/de/manaforge-omega/loomithar
+  soulbinder:
+    name: Soulbinder Naazindhri
+    url: https://www.mythictrap.com/de/manaforge-omega/soulbinder-naazindhri
+  araz:
+    name: Forgeweaver Araz
+    url: https://www.mythictrap.com/de/manaforge-omega/forgeweaver-araz
+  soul_hunters:
+    name: The Soul Hunters
+    url: https://www.mythictrap.com/de/manaforge-omega/the-soul-hunters
+  fractilus:
+    name: Fractilus
+    url: https://www.mythictrap.com/de/manaforge-omega/fractillus
+  nexus_king:
+    name:  Nexus King Salhadaar
+    url: https://www.mythictrap.com/de/manaforge-omega/nexus-king-salhadaar
+  dimensius:
+    name: Dimensius, the All-Devouring
+    url: https://www.mythictrap.com/de/manaforge-omega/dimensius-the-all-devouring
