@@ -1,0 +1,109 @@
+raid_class_guides:
+  # ToDo: Update links from archon.gg
+  death_knight:
+    blood: https://www.wowhead.com/guide/classes/death-knight/blood/overview-pve-tank
+    frost: https://www.wowhead.com/guide/classes/death-knight/frost/overview-pve-dps
+    unholy: https://www.wowhead.com/guide/classes/death-knight/unholy/overview-pve-dps
+  demon_hunter:
+    devourer: # needs to be updated as soon as available
+    havoc: https://www.wowhead.com/guide/classes/death-knight/unholy/overview-pve-dps
+    Vengeance: https://www.wowhead.com/guide/classes/demon-hunter/vengeance/overview-pve-tank
+  druid:
+    balance: https://www.wowhead.com/guide/classes/druid/balance/overview-pve-dps
+    feral: https://www.wowhead.com/guide/classes/druid/balance/overview-pve-dps
+    guardian: https://www.wowhead.com/guide/classes/druid/guardian/overview-pve-tank
+    restoration: https://www.wowhead.com/guide/classes/druid/restoration/overview-pve-healer
+  evoker:
+    augmentation: https://www.wowhead.com/guide/classes/evoker/augmentation/overview-pve-dps
+    devestation: https://www.wowhead.com/guide/classes/evoker/devastation/overview-pve-dps
+    preservation: https://www.wowhead.com/guide/classes/evoker/preservation/overview-pve-healer
+  hunter:
+    beast_mastery: https://www.wowhead.com/guide/classes/hunter/beast-mastery/overview-pve-dps
+    marksmanship: https://www.wowhead.com/guide/classes/hunter/marksmanship/overview-pve-dps
+    survival: https://www.wowhead.com/guide/classes/hunter/survival/overview-pve-dps
+  mage:
+    arcane: https://www.wowhead.com/guide/classes/mage/arcane/overview-pve-dps
+    fire: https://www.wowhead.com/guide/classes/mage/fire/overview-pve-dps
+    frost: https://www.wowhead.com/guide/classes/mage/frost/overview-pve-dps
+  monk:
+    brewmaster: https://www.wowhead.com/guide/classes/monk/brewmaster/overview-pve-tank
+    mistweaver: https://www.wowhead.com/guide/classes/monk/mistweaver/overview-pve-healer
+    windwalker: https://www.wowhead.com/guide/classes/monk/windwalker/overview-pve-dps
+  paladin:
+    holy: https://www.wowhead.com/guide/classes/paladin/holy/overview-pve-healer
+    protection: https://www.wowhead.com/guide/classes/paladin/protection/overview-pve-tank
+    retribution: https://www.wowhead.com/guide/classes/paladin/retribution/overview-pve-dps
+  priest:
+    discipline: https://www.wowhead.com/guide/classes/priest/discipline/overview-pve-healer
+    holy: https://www.wowhead.com/guide/classes/priest/holy/overview-pve-healer
+    shadow: https://www.wowhead.com/guide/classes/priest/shadow/overview-pve-dps
+  rouge:
+    assassionation: https://www.wowhead.com/guide/classes/rogue/assassination/overview-pve-dps
+    outlaw: https://www.wowhead.com/guide/classes/rogue/outlaw/overview-pve-dps
+    subtlety: https://www.wowhead.com/guide/classes/rogue/outlaw/overview-pve-dps
+  shaman:
+    elemental: https://www.wowhead.com/guide/classes/shaman/elemental/overview-pve-dps
+    enhancement: https://www.wowhead.com/guide/classes/shaman/enhancement/overview-pve-dps
+    restoration: https://www.wowhead.com/guide/classes/shaman/restoration/overview-pve-healer
+  warlock:
+    affliction: https://www.wowhead.com/guide/classes/warlock/affliction/overview-pve-dps
+    demonology: https://www.wowhead.com/guide/classes/warlock/demonology/overview-pve-dps
+    destruction: https://www.wowhead.com/guide/classes/warlock/destruction/overview-pve-dps
+  warrior:
+    arms: https://www.wowhead.com/guide/classes/warrior/arms/overview-pve-dps
+    fury: https://www.wowhead.com/guide/classes/warrior/fury/overview-pve-dps
+    protection: https://www.wowhead.com/guide/classes/warrior/protection/overview-pve-tank
+mplus:
+  death_knight:
+    blood: https://www.wowhead.com/guide/classes/death-knight/blood/overview-pve-tank
+    frost: https://www.wowhead.com/guide/classes/death-knight/frost/overview-pve-dps
+    unholy: https://www.wowhead.com/guide/classes/death-knight/unholy/overview-pve-dps
+  demon_hunter:
+    devourer: # needs to be updated as soon as available
+    havoc: https://www.wowhead.com/guide/classes/death-knight/unholy/overview-pve-dps
+    Vengeance: https://www.wowhead.com/guide/classes/demon-hunter/vengeance/overview-pve-tank
+  druid:
+    balance: https://www.wowhead.com/guide/classes/druid/balance/overview-pve-dps
+    feral: https://www.wowhead.com/guide/classes/druid/balance/overview-pve-dps
+    guardian: https://www.wowhead.com/guide/classes/druid/guardian/overview-pve-tank
+    restoration: https://www.wowhead.com/guide/classes/druid/restoration/overview-pve-healer
+  evoker:
+    augmentation: https://www.wowhead.com/guide/classes/evoker/augmentation/overview-pve-dps
+    devestation: https://www.wowhead.com/guide/classes/evoker/devastation/overview-pve-dps
+    preservation: https://www.wowhead.com/guide/classes/evoker/preservation/overview-pve-healer
+  hunter:
+    beast_mastery: https://www.wowhead.com/guide/classes/hunter/beast-mastery/overview-pve-dps
+    marksmanship: https://www.wowhead.com/guide/classes/hunter/marksmanship/overview-pve-dps
+    survival: https://www.wowhead.com/guide/classes/hunter/survival/overview-pve-dps
+  mage:
+    arcane: https://www.wowhead.com/guide/classes/mage/arcane/overview-pve-dps
+    fire: https://www.wowhead.com/guide/classes/mage/fire/overview-pve-dps
+    frost: https://www.wowhead.com/guide/classes/mage/frost/overview-pve-dps
+  monk:
+    brewmaster: https://www.wowhead.com/guide/classes/monk/brewmaster/overview-pve-tank
+    mistweaver: https://www.wowhead.com/guide/classes/monk/mistweaver/overview-pve-healer
+    windwalker: https://www.wowhead.com/guide/classes/monk/windwalker/overview-pve-dps
+  paladin:
+    holy: https://www.wowhead.com/guide/classes/paladin/holy/overview-pve-healer
+    protection: https://www.wowhead.com/guide/classes/paladin/protection/overview-pve-tank
+    retribution: https://www.wowhead.com/guide/classes/paladin/retribution/overview-pve-dps
+  priest:
+    discipline: https://www.wowhead.com/guide/classes/priest/discipline/overview-pve-healer
+    holy: https://www.wowhead.com/guide/classes/priest/holy/overview-pve-healer
+    shadow: https://www.wowhead.com/guide/classes/priest/shadow/overview-pve-dps
+  rouge:
+    assassionation: https://www.wowhead.com/guide/classes/rogue/assassination/overview-pve-dps
+    outlaw: https://www.wowhead.com/guide/classes/rogue/outlaw/overview-pve-dps
+    subtlety: https://www.wowhead.com/guide/classes/rogue/outlaw/overview-pve-dps
+  shaman:
+    elemental: https://www.wowhead.com/guide/classes/shaman/elemental/overview-pve-dps
+    enhancement: https://www.wowhead.com/guide/classes/shaman/enhancement/overview-pve-dps
+    restoration: https://www.wowhead.com/guide/classes/shaman/restoration/overview-pve-healer
+  warlock:
+    affliction: https://www.wowhead.com/guide/classes/warlock/affliction/overview-pve-dps
+    demonology: https://www.wowhead.com/guide/classes/warlock/demonology/overview-pve-dps
+    destruction: https://www.wowhead.com/guide/classes/warlock/destruction/overview-pve-dps
+  warrior:
+    arms: https://www.wowhead.com/guide/classes/warrior/arms/overview-pve-dps
+    fury: https://www.wowhead.com/guide/classes/warrior/fury/overview-pve-dps
+    protection: https://www.wowhead.com/guide/classes/warrior/protection/overview-pve-tank
