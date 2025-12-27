@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import logging
+import asyncio
 from typing import Dict, Tuple, Optional
 
 import discord
@@ -65,23 +66,6 @@ def load_raids(path: str) -> Dict[str, Dict[str, str]]:
     return raw.get("bosses", {}) or {}
 
 
-# ---------- Daten laden ----------
-
-GUIDES_PATH = os.path.join(MAPPINGS_DIR, "guides.yaml")
-MPLUS_PATH = os.path.join(MAPPINGS_DIR, "mplus.yaml")
-RAIDS_PATH = os.path.join(MAPPINGS_DIR, "raid.yaml")
-
-WOWHEAD_GUIDES, ICY_VEINS_GUIDES = load_guides(GUIDES_PATH)
-MPLUS_DUNGEONS = load_mplus(MPLUS_PATH)
-RAID_BOSSES = load_raids(RAIDS_PATH)
-
-logger.info("Mappings geladen: %d Wowhead, %d Icy-Veins, %d Dungeons, %d Bosse",
-            len(WOWHEAD_GUIDES),
-            len(ICY_VEINS_GUIDES),
-            len(MPLUS_DUNGEONS),
-            len(RAID_BOSSES),
-            )
-
 # ---------- Discord Bot Setup ----------
 
 intents = discord.Intents.default()
@@ -95,207 +79,234 @@ async def on_ready():
     logger.info("Bot is ready.")
 
 
-# ---------- Helper ----------
+# ---------- Cog für WoW-Helper-Funktionen ----------
 
-def find_class_spec_in_text(text: str) -> Optional[Tuple[str, str]]:
+class WowHelperCog(commands.Cog):
     """
-    Sehr einfache Auto-Erkennung:
-    Wir schauen, ob im Text "<spec> <class>" oder "<class> <spec>" vorkommt,
-    basierend auf allen bekannten (klasse, spec)-Keys.
+    Ein Cog, das alle Befehle und die Auto-Erkennungslogik für den WoW-Bot bündelt.
     """
-    text = text.lower()
+    def __init__(self, bot, wowhead_guides, icy_veins_guides, mplus_dungeons, raid_bosses):
+        self.bot = bot
+        self.wowhead_guides = wowhead_guides
+        self.icy_veins_guides = icy_veins_guides
+        self.mplus_dungeons = mplus_dungeons
+        self.raid_bosses = raid_bosses
+        logger.info("WowHelperCog initialisiert.")
 
-    for (cls, spec) in set(list(WOWHEAD_GUIDES.keys()) + list(ICY_VEINS_GUIDES.keys())):
-        combo1 = f"{spec} {cls}"
-        combo2 = f"{cls} {spec}"
-        if combo1 in text or combo2 in text:
-            return cls, spec
+    # ---------- Helper ----------
 
-    return None
+    def _find_class_spec_in_text(self, text: str) -> Optional[Tuple[str, str]]:
+        """
+        Sehr einfache Auto-Erkennung:
+        Wir schauen, ob im Text "<spec> <class>" oder "<class> <spec>" vorkommt,
+        basierend auf allen bekannten (klasse, spec)-Keys.
+        """
+        text = text.lower()
+        all_keys = set(list(self.wowhead_guides.keys()) + list(self.icy_veins_guides.keys()))
 
+        for (cls, spec) in all_keys:
+            combo1 = f"{spec} {cls}"
+            combo2 = f"{cls} {spec}"
+            if combo1 in text or combo2 in text:
+                return cls, spec
+        return None
 
-def find_dungeon_in_text(text: str) -> Optional[str]:
-    """
-    Dungeon anhand slug oder name erkennen.
-    Sehr simpel: prüft, ob slug oder dungeon-name im Text vorkommt.
-    """
-    text = text.lower()
+    def _find_dungeon_in_text(self, text: str) -> Optional[str]:
+        """
+        Dungeon anhand slug oder name erkennen.
+        Sehr simpel: prüft, ob slug oder dungeon-name im Text vorkommt.
+        """
+        text = text.lower()
+        for slug, data in self.mplus_dungeons.items():
+            name = (data.get("name") or "").lower()
+            if slug.lower() in text or (name and name in text):
+                return slug
+        return None
 
-    for slug, data in MPLUS_DUNGEONS.items():
-        name = (data.get("name") or "").lower()
-        if slug.lower() in text or (name and name in text):
-            return slug
+    def _find_boss_in_text(self, text: str) -> Optional[str]:
+        """
+        Raidboss anhand slug oder name erkennen.
+        """
+        text = text.lower()
+        for slug, data in self.raid_bosses.items():
+            name = (data.get("name") or "").lower()
+            if slug.lower() in text or (name and name in text):
+                return slug
+        return None
 
-    return None
+    # ---------- Commands ----------
 
+    @commands.command(name="guide")
+    async def guide_command(self, ctx: commands.Context, kind: str, cls: str, spec: str):
+        """
+        !guide class <klasse> <spec>
+        Beispiel: !guide class paladin prot
+        """
+        kind = kind.lower()
+        cls = cls.lower()
+        spec = spec.lower()
 
-def find_boss_in_text(text: str) -> Optional[str]:
-    """
-    Raidboss anhand slug oder name erkennen.
-    """
-    text = text.lower()
+        if kind != "class":
+            await ctx.send("Aktuell unterstütze ich nur `!guide class <klasse> <spec>`.")
+            return
 
-    for slug, data in RAID_BOSSES.items():
-        name = (data.get("name") or "").lower()
-        if slug.lower() in text or (name and name in text):
-            return slug
+        key = (cls, spec)
+        wowhead = self.wowhead_guides.get(key)
+        icy = self.icy_veins_guides.get(key)
 
-    return None
+        if not wowhead and not icy:
+            await ctx.send(f"Keinen Guide gefunden für Klasse **{cls}** / Spec **{spec}**")
+            return
 
+        parts = [f"Guides für **{cls.title()} {spec.title()}**:"]
+        if wowhead:
+            parts.append(f"- Wowhead: {wowhead}")
+        if icy:
+            parts.append(f"- Icy Veins: {icy}")
 
-# ---------- Commands ----------
+        await ctx.send("\n".join(parts))
 
-@bot.command(name="guide")
-async def guide_command(ctx: commands.Context, kind: str, cls: str, spec: str):
-    """
-    !guide class <klasse> <spec>
-    Beispiel: !guide class paladin prot
-    """
-    kind = kind.lower()
-    cls = cls.lower()
-    spec = spec.lower()
+    @commands.command(name="mplus")
+    async def mplus_command(self, ctx: commands.Context, subcmd: str, dungeon_slug: str, level: Optional[int] = None):
+        """
+        !mplus route <dungeon_slug> [stufe]
+        Beispiel: !mplus route hoa
+        """
+        subcmd = subcmd.lower()
+        dungeon_slug = dungeon_slug.lower()
 
-    if kind != "class":
-        await ctx.send("Aktuell unterstütze ich nur `!guide class <klasse> <spec>`.")
-        return
+        if subcmd != "route":
+            await ctx.send("Verwendung: `!mplus route <dungeon> [stufe]`")
+            return
 
-    key = (cls, spec)
-    wowhead = WOWHEAD_GUIDES.get(key)
-    icy = ICY_VEINS_GUIDES.get(key)
+        dungeon = self.mplus_dungeons.get(dungeon_slug)
+        if not dungeon:
+            await ctx.send(f"Keine Route für Dungeon **{dungeon_slug}** gefunden 🙈")
+            return
 
-    if not wowhead and not icy:
-        await ctx.send(f"Keinen Guide gefunden für Klasse **{cls}** / Spec **{spec}**")
-        return
+        name = dungeon.get("name", dungeon_slug)
+        url = dungeon.get("url")
 
-    parts = [f"Guides für **{cls.title()} {spec.title()}**:"]
-    if wowhead:
-        parts.append(f"- Wowhead: {wowhead}")
-    if icy:
-        parts.append(f"- Icy Veins: {icy}")
+        if not url:
+            await ctx.send(f"Für **{name}** ist noch keine Route-URL hinterlegt.")
+            return
 
-    await ctx.send("\n".join(parts))
+        if level:
+            await ctx.send(f"M+ Route für **{name}** (Level {level}):\n{url}")
+        else:
+            await ctx.send(f"M+ Route für **{name}**:\n{url}")
 
+    @commands.command(name="raid")
+    async def raid_command(self, ctx: commands.Context, boss_slug: str, mode: Optional[str] = None):
+        """
+        !raid <boss_slug> [mode]
+        Beispiel: !raid raszageth mythic
+        """
+        boss_slug = boss_slug.lower()
+        boss = self.raid_bosses.get(boss_slug)
 
-@bot.command(name="mplus")
-async def mplus_command(ctx: commands.Context, subcmd: str, dungeon_slug: str, level: Optional[int] = None):
-    """
-    !mplus route <dungeon_slug> [stufe]
-    Beispiel: !mplus route hoa
-    """
-    subcmd = subcmd.lower()
-    dungeon_slug = dungeon_slug.lower()
+        if not boss:
+            await ctx.send(f"Kein MythicTrap-Link für Boss **{boss_slug}** gefunden")
+            return
 
-    if subcmd != "route":
-        await ctx.send("Verwendung: `!mplus route <dungeon> [stufe]`")
-        return
+        name = boss.get("name", boss_slug)
+        url = boss.get("url")
 
-    dungeon = MPLUS_DUNGEONS.get(dungeon_slug)
-    if not dungeon:
-        await ctx.send(f"Keine Route für Dungeon **{dungeon_slug}** gefunden 🙈")
-        return
+        if not url:
+            await ctx.send(f"Für **{name}** ist noch kein MythicTrap-Link hinterlegt.")
+            return
 
-    name = dungeon.get("name", dungeon_slug)
-    url = dungeon.get("url")
+        if mode:
+            await ctx.send(f"Infos zu **{name}** ({mode}):\n{url}")
+        else:
+            await ctx.send(f"Infos zu **{name}**:\n{url}")
 
-    if not url:
-        await ctx.send(f"Für **{name}** ist noch keine Route-URL hinterlegt.")
-        return
+    # ---------- Auto-Erkennung im Chat ----------
 
-    if level:
-        await ctx.send(f"M+ Route für **{name}** (Level {level}):\n{url}")
-    else:
-        await ctx.send(f"M+ Route für **{name}**:\n{url}")
+    @commands.Cog.listener()
+    async def on_message(self, message: discord.Message):
+        # eigene Messages ignorieren
+        if message.author == self.bot.user:
+            return
 
+        content = message.content.lower()
 
-@bot.command(name="raid")
-async def raid_command(ctx: commands.Context, boss_slug: str, mode: Optional[str] = None):
-    """
-    !raid <boss_slug> [mode]
-    Beispiel: !raid raszageth mythic
-    """
-    boss_slug = boss_slug.lower()
-    boss = RAID_BOSSES.get(boss_slug)
+        # Nur ausführen, wenn es kein expliziter Command ist, um doppelte Antworten zu vermeiden.
+        if not content.startswith(self.bot.command_prefix):
+            # --- 1) Klassenguide Auto-Hilfe ---
+            cls_spec = self._find_class_spec_in_text(content)
+            if cls_spec:
+                cls, spec = cls_spec
+                key = (cls, spec)
+                wowhead = self.wowhead_guides.get(key)
+                icy = self.icy_veins_guides.get(key)
 
-    if not boss:
-        await ctx.send(f"Kein MythicTrap-Link für Boss **{boss_slug}** gefunden")
-        return
-
-    name = boss.get("name", boss_slug)
-    url = boss.get("url")
-
-    if not url:
-        await ctx.send(f"Für **{name}** ist noch kein MythicTrap-Link hinterlegt.")
-        return
-
-    if mode:
-        await ctx.send(f"Infos zu **{name}** ({mode}):\n{url}")
-    else:
-        await ctx.send(f"Infos zu **{name}**:\n{url}")
-
-
-# ---------- Auto-Erkennung im Chat ----------
-
-@bot.event
-async def on_message(message: discord.Message):
-    # eigene Messages ignorieren
-    if message.author == bot.user:
-        return
-
-    content = message.content.lower()
-
-    # Nur ausführen, wenn es kein expliziter Command ist, um doppelte Antworten zu vermeiden.
-    if not content.startswith(bot.command_prefix):
-        # --- 1) Klassenguide Auto-Hilfe ---
-        cls_spec = find_class_spec_in_text(content)
-        if cls_spec:
-            cls, spec = cls_spec
-            key = (cls, spec)
-            wowhead = WOWHEAD_GUIDES.get(key)
-            icy = ICY_VEINS_GUIDES.get(key)
-
-            if wowhead or icy:
-                parts = [f"Guides für **{cls.title()} {spec.title()}** gefunden:"]
-                if wowhead:
-                    parts.append(f"- Wowhead: {wowhead}")
-                if icy:
-                    parts.append(f"- Icy Veins: {icy}")
-                await message.channel.send("\n".join(parts))
-                return
-
-        # --- 2) M+ Auto-Hilfe ---
-        dungeon_slug = find_dungeon_in_text(content)
-        if dungeon_slug:
-            dungeon = MPLUS_DUNGEONS.get(dungeon_slug)
-            if dungeon:
-                name = dungeon.get("name", dungeon_slug)
-                url = dungeon.get("url")
-                if url:
-                    await message.channel.send(f"M+ Route für **{name}**:\n{url}")
+                if wowhead or icy:
+                    parts = [f"Guides für **{cls.title()} {spec.title()}** gefunden:"]
+                    if wowhead:
+                        parts.append(f"- Wowhead: {wowhead}")
+                    if icy:
+                        parts.append(f"- Icy Veins: {icy}")
+                    await message.channel.send("\n".join(parts))
                     return
 
-        # --- 3) Raid-Boss Auto-Hilfe ---
-        boss_slug = find_boss_in_text(content)
-        if boss_slug:
-            boss = RAID_BOSSES.get(boss_slug)
-            if boss:
-                name = boss.get("name", boss_slug)
-                url = boss.get("url")
-                if url:
-                    await message.channel.send(f"Infos zu **{name}**:\n{url}")
-                    return
+            # --- 2) M+ Auto-Hilfe ---
+            dungeon_slug = self._find_dungeon_in_text(content)
+            if dungeon_slug:
+                dungeon = self.mplus_dungeons.get(dungeon_slug)
+                if dungeon:
+                    name = dungeon.get("name", dungeon_slug)
+                    url = dungeon.get("url")
+                    if url:
+                        await message.channel.send(f"M+ Route für **{name}**:\n{url}")
+                        return
 
-    # WICHTIG: Commands weiterhin verarbeiten
-    await bot.process_commands(message)
+            # --- 3) Raid-Boss Auto-Hilfe ---
+            boss_slug = self._find_boss_in_text(content)
+            if boss_slug:
+                boss = self.raid_bosses.get(boss_slug)
+                if boss:
+                    name = boss.get("name", boss_slug)
+                    url = boss.get("url")
+                    if url:
+                        await message.channel.send(f"Infos zu **{name}**:\n{url}")
+                        return
+
+        # WICHTIG: Commands weiterhin verarbeiten
+        await self.bot.process_commands(message)
 
 
 # ---------- Start ----------
 
-def main():
+async def main():
     token = os.getenv("DISCORD_BOT_TOKEN")
     if not token:
         raise SystemExit("Bitte DISCORD_BOT_TOKEN als Umgebungsvariable setzen.")
-    bot.run(token)
+
+    # ---------- Daten laden ----------
+    guides_path = os.path.join(MAPPINGS_DIR, "guides.yaml")
+    mplus_path = os.path.join(MAPPINGS_DIR, "mplus.yaml")
+    raids_path = os.path.join(MAPPINGS_DIR, "raid.yaml")
+
+    wowhead_guides, icy_veins_guides = load_guides(guides_path)
+    mplus_dungeons = load_mplus(mplus_path)
+    raid_bosses = load_raids(raids_path)
+
+    logger.info("Mappings geladen: %d Wowhead, %d Icy-Veins, %d Dungeons, %d Bosse",
+                len(wowhead_guides),
+                len(icy_veins_guides),
+                len(mplus_dungeons),
+                len(raid_bosses),
+                )
+
+    # ---------- Cog laden und Bot starten ----------
+    cog = WowHelperCog(bot, wowhead_guides, icy_veins_guides, mplus_dungeons, raid_bosses)
+    await bot.add_cog(cog)
+    await bot.start(token)
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        logger.info("Bot wird heruntergefahren.")
