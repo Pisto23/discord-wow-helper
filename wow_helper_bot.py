@@ -69,7 +69,7 @@ def load_raids(path: str) -> Dict[str, Dict[str, str]]:
 
 GUIDES_PATH = os.path.join(MAPPINGS_DIR, "guides.yaml")
 MPLUS_PATH = os.path.join(MAPPINGS_DIR, "mplus.yaml")
-RAIDS_PATH = os.path.join(MAPPINGS_DIR, "raids.yaml")
+RAIDS_PATH = os.path.join(MAPPINGS_DIR, "raid.yaml")
 
 WOWHEAD_GUIDES, ICY_VEINS_GUIDES = load_guides(GUIDES_PATH)
 MPLUS_DUNGEONS = load_mplus(MPLUS_PATH)
@@ -243,43 +243,46 @@ async def on_message(message: discord.Message):
 
     content = message.content.lower()
 
-    # --- 1) Klassenguide Auto-Hilfe ---
-    if any(word in content for word in ["hilfe", "help", "guide"]):
+    # Nur ausführen, wenn es kein expliziter Command ist, um doppelte Antworten zu vermeiden.
+    if not content.startswith(bot.command_prefix):
+        # --- 1) Klassenguide Auto-Hilfe ---
         cls_spec = find_class_spec_in_text(content)
         if cls_spec:
             cls, spec = cls_spec
-            wowhead = WOWHEAD_GUIDES.get((cls, spec))
-            icy = ICY_VEINS_GUIDES.get((cls, spec))
+            key = (cls, spec)
+            wowhead = WOWHEAD_GUIDES.get(key)
+            icy = ICY_VEINS_GUIDES.get(key)
 
             if wowhead or icy:
-                parts = [f"Sieht so aus, als bräuchtest du Hilfe als **{cls.title()} {spec.title()}** 😄"]
+                parts = [f"Guides für **{cls.title()} {spec.title()}** gefunden:"]
                 if wowhead:
                     parts.append(f"- Wowhead: {wowhead}")
                 if icy:
                     parts.append(f"- Icy Veins: {icy}")
                 await message.channel.send("\n".join(parts))
+                return
 
-    # --- 2) M+ Auto-Hilfe ---
-    if any(word in content for word in ["m+", "mplus", "mythic+", "key", "keystone"]):
+        # --- 2) M+ Auto-Hilfe ---
         dungeon_slug = find_dungeon_in_text(content)
         if dungeon_slug:
             dungeon = MPLUS_DUNGEONS.get(dungeon_slug)
-            if dungeon and dungeon.get("url"):
+            if dungeon:
                 name = dungeon.get("name", dungeon_slug)
-                await message.channel.send(
-                    f"Hier eine Route für **{name}**:\n{dungeon['url']}"
-                )
+                url = dungeon.get("url")
+                if url:
+                    await message.channel.send(f"M+ Route für **{name}**:\n{url}")
+                    return
 
-    # --- 3) Raid-Boss Auto-Hilfe ---
-    if any(word in content for word in ["raid", "boss", "pull"]):
+        # --- 3) Raid-Boss Auto-Hilfe ---
         boss_slug = find_boss_in_text(content)
         if boss_slug:
             boss = RAID_BOSSES.get(boss_slug)
-            if boss and boss.get("url"):
+            if boss:
                 name = boss.get("name", boss_slug)
-                await message.channel.send(
-                    f"Infos zu **{name}** findest du hier:\n{boss['url']}"
-                )
+                url = boss.get("url")
+                if url:
+                    await message.channel.send(f"Infos zu **{name}**:\n{url}")
+                    return
 
     # WICHTIG: Commands weiterhin verarbeiten
     await bot.process_commands(message)
