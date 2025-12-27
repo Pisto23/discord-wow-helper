@@ -26,27 +26,27 @@ If your YAML files use different names (for example `raid.yaml`), rename them to
 
 1. Create a Python virtual environment and activate it:
 
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
 ```
 
 2. Install dependencies (this project uses `discord.py` and `PyYAML`):
 
-```powershell
+```bash
 pip install -U discord.py PyYAML
 ```
 
 3. Set your Discord bot token as an environment variable:
 
-```powershell
-$env:DISCORD_BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"
+```bash
+export DISCORD_BOT_TOKEN="YOUR_BOT_TOKEN_HERE"
 ```
 
 4. Run the bot:
 
-```powershell
-python wow_helper_bot.py
+```bash
+python3 wow_helper_bot.py
 ```
 
 The bot will log in and begin responding in any server where it is invited and has the necessary permissions.
