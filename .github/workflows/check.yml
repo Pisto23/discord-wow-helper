@@ -1,0 +1,32 @@
+name: Python Code Check (Debian Bookworm Environment)
+
+on:
+  push:
+    branches: [ main, master, ppulpan-update-bot ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  check-code:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Code auschecken
+        uses: actions/checkout@v4
+
+      - name: Python 3.11 einrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Abhängigkeiten installieren
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff
+
+      - name: Ruff Check (Linter)
+        run: ruff check .
+
+      - name: Ruff Format Check
+        run: ruff format --check .
