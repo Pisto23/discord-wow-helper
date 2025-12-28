@@ -8,7 +8,7 @@ A small Discord helper bot for World of Warcraft that answers quick questions an
 
 ## Features
 
-- Command-based lookups: `!guide`, `!mplus`, `!raid`.
+- Slash command lookups: `/guide`, `/mplus`, `/raid`.
 - Auto-detection: the bot scans messages for class+spec, M+ dungeon names, or raid boss names and posts helpful links.
 - Configurable mappings: add or edit `mappings/*.yaml` to extend or fix content without changing code.
 
@@ -51,14 +51,14 @@ python3 wow_helper_bot.py
 
 The bot will log in and begin responding in any server where it is invited and has the necessary permissions.
 
-## Commands & examples
+## Slash Commands & examples
 
-- `!guide class <klasse> <spec>` — explicit guide lookup.
-	- Example: `!guide class paladin prot`
-- `!mplus route <dungeon_slug> [stufe]` — posts a route link for a dungeon.
-	- Example: `!mplus route hoa 16`
-- `!raid <boss_slug> [mode]` — posts raid/boss info link.
-	- Example: `!raid raszageth mythic`
+- `/guide class <klasse> <spec>` — explicit guide lookup.
+	- Example: `/guide class paladin prot`
+- `/mplus route <dungeon_slug>` — posts a route link for a dungeon.
+	- Example: `/mplus route hoa`
+- `/raid <boss_slug>` — posts raid/boss info link.
+	- Example: `/raid dimensius`
 
 In addition to commands, the bot attempts to auto-detect mentions of class/spec (e.g. "prot paladin"), M+ references (e.g. dungeon names), and raid boss names and will reply with the best-matching links.
 
