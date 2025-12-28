@@ -44,7 +44,6 @@ class WoWBot(commands.Bot):
     def __init__(self):
         intents = discord.Intents.default()
         intents.message_content = True
-        # Der Bot reagiert auf !
         super().__init__(command_prefix="!", intents=intents)
 
     async def setup_hook(self):
@@ -58,7 +57,6 @@ class WoWBot(commands.Bot):
         }
         await self.add_cog(WowHelper(self, data))
 
-        # WICHTIG: Erzwingt das Update der / Befehle bei Discord
         logger.info("Synchronisiere Slash-Commands mit Discord...")
         await self.tree.sync()
         logger.info("Synchronisierung fertig!")
@@ -68,76 +66,81 @@ class WowHelper(commands.Cog):
     def __init__(self, bot, data):
         self.bot = bot
         self.data = data
-        # Erstellt eine Liste aller verfügbaren Klassen für das erste Feld
         self.all_classes = sorted(list(set(k[0] for k in data["wowhead"].keys())))
 
     # --- Autocomplete Funktionen ---
 
-    async def klasse_autocomplete(
-        self, interaction: discord.Interaction, current: str
-    ) -> list[app_commands.Choice[str]]:
+    async def klasse_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
         return [
             app_commands.Choice(name=cls.title(), value=cls)
-            for cls in self.all_classes
-            if current.lower() in cls.lower()
-        ][:25]  # Discord erlaubt maximal 25 Vorschläge
+            for cls in self.all_classes if current.lower() in cls.lower()
+        ][:25]
 
-    async def spec_autocomplete(
-        self, interaction: discord.Interaction, current: str
-    ) -> list[app_commands.Choice[str]]:
-        # Holt die bereits gewählte Klasse aus dem anderen Feld
+    async def spec_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
         selected_class = interaction.namespace.klasse
         if not selected_class:
             return []
-
-        # Findet alle Specs, die zu dieser Klasse in den Daten existieren
-        available_specs = [
-            k[1] for k in self.data["wowhead"].keys() if k[0] == selected_class.lower()
-        ]
-
+        available_specs = [k[1] for k in self.data["wowhead"].keys() if k[0] == selected_class.lower()]
         return [
             app_commands.Choice(name=spec.title(), value=spec)
-            for spec in sorted(available_specs)
-            if current.lower() in spec.lower()
+            for spec in sorted(available_specs) if current.lower() in spec.lower()
         ][:25]
 
-    # --- Der Command mit Autocomplete-Verknüpfung ---
+    async def dungeon_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        return [
+            app_commands.Choice(name=d["name"], value=slug)
+            for slug, d in self.data["mplus"].items()
+            if current.lower() in d["name"].lower() or current.lower() in slug.lower()
+        ][:25]
 
-    @commands.hybrid_command(
-        name="guide", description="Zeigt WoW Guides für Klasse und Spec"
-    )
-    @app_commands.describe(
-        klasse="Wähle deine Klasse", spec="Wähle deine Spezialisierung"
-    )
+    async def raid_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        return [
+            app_commands.Choice(name=b["name"], value=slug)
+            for slug, b in self.data["raids"].items()
+            if current.lower() in b["name"].lower() or current.lower() in slug.lower()
+        ][:25]
+
+    # --- Commands ---
+
+    @commands.hybrid_command(name="guide", description="Zeigt WoW Guides für Klasse und Spec")
+    @app_commands.describe(klasse="Wähle deine Klasse", spec="Wähle deine Spezialisierung")
     @app_commands.autocomplete(klasse=klasse_autocomplete, spec=spec_autocomplete)
     async def guide(self, ctx: commands.Context, klasse: str, spec: str):
         k, s = klasse.lower(), spec.lower()
         key = (k, s)
-
-        # Check ob Daten existieren
         if key not in self.data["wowhead"] and key not in self.data["icy"]:
             await ctx.send(f"Kein Guide für {klasse} {spec} gefunden.", ephemeral=True)
             return
 
-        embed = discord.Embed(
-            title=f"Guides: {k.title()} {s.title()}",
-            color=discord.Color.blue(),
-            description="Hier sind die aktuellsten Guides für deine Wahl:",
-        )
-
+        embed = discord.Embed(title=f"Guides: {k.title()} {s.title()}", color=discord.Color.blue())
         if key in self.data["wowhead"]:
-            embed.add_field(
-                name="Wowhead",
-                value=f"[Zum Wowhead Guide]({self.data['wowhead'][key]})",
-                inline=False,
-            )
+            embed.add_field(name="Wowhead", value=f"[Zum Guide]({self.data['wowhead'][key]})", inline=False)
         if key in self.data["icy"]:
-            embed.add_field(
-                name="Icy Veins",
-                value=f"[Zum Icy Veins Guide]({self.data['icy'][key]})",
-                inline=False,
-            )
+            embed.add_field(name="Icy Veins", value=f"[Zum Guide]({self.data['icy'][key]})", inline=False)
+        await ctx.send(embed=embed)
 
+    @commands.hybrid_command(name="mplus", description="Zeigt die M+ Route für einen Dungeon")
+    @app_commands.describe(dungeon="Wähle den Dungeon")
+    @app_commands.autocomplete(dungeon=dungeon_autocomplete)
+    async def mplus(self, ctx: commands.Context, dungeon: str):
+        d_data = self.data["mplus"].get(dungeon.lower())
+        if not d_data:
+            await ctx.send(f"Dungeon `{dungeon}` nicht gefunden.", ephemeral=True)
+            return
+        embed = discord.Embed(title=f"M+ Route: {d_data['name']}", color=discord.Color.green())
+        embed.add_field(name="Route Link", value=f"[Hier klicken]({d_data['url']})")
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(name="raid", description="Zeigt Boss-Infos aus dem Raid")
+    @app_commands.describe(boss="Wähle den Boss")
+    @app_commands.autocomplete(boss=raid_autocomplete)
+    async def raid(self, ctx: commands.Context, boss: str):
+        b_data = self.data["raids"].get(boss.lower())
+        if not b_data:
+            await ctx.send(f"Boss `{boss}` nicht gefunden.", ephemeral=True)
+            return
+        embed = discord.Embed(title=f"Raid Boss: {b_data['name']}", color=discord.Color.red())
+        embed.add_field(name="Guide Link", value=f"[MythicTrap / Guide]({b_data['url']})")
         await ctx.send(embed=embed)
 
 
@@ -145,7 +148,6 @@ async def main():
     bot = WoWBot()
     async with bot:
         await bot.start(TOKEN)
-
 
 if __name__ == "__main__":
     asyncio.run(main())
