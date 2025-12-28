@@ -34,13 +34,13 @@ source .venv/bin/activate
 2. Install dependencies (this project uses `discord.py` and `PyYAML`):
 
 ```bash
-pip install -U discord.py PyYAML
+pip install -r requirements.txt
 ```
 
-3. Set your Discord bot token as an environment variable:
+3. Save your Discord bot token in a `.env` file placed in the project root. The file should use simple KEY=VALUE format (no quotes):
 
 ```bash
-export DISCORD_BOT_TOKEN="YOUR_BOT_TOKEN_HERE"
+DISCORD_TOKEN=YOUR_BOT_TOKEN_HERE
 ```
 
 4. Run the bot:
@@ -69,7 +69,7 @@ Open the YAML files in `mappings/` to add or update entries. The loader function
 ## Development
 
 - Code entry point: `wow_helper_bot.py`
-- Main settings: `DISCORD_BOT_TOKEN` environment variable
+- Main settings: `DISCORD_BOT_TOKEN` in .env file
 - Mapping directory: `mappings/`
 
 To run locally for development, follow the Quick start and edit the YAML files or Python code as needed.
@@ -78,11 +78,6 @@ To run locally for development, follow the Quick start and edit the YAML files o
 
 Feel free to open issues or submit pull requests. When adding mappings, prefer clear slugs and full URLs so auto-detection works reliably.
 
-## License
-
-This repository does not include a license file. Add a LICENSE if you want to define reuse terms.
-
 ---
 
 If anything in this README should reflect additional project details or custom commands you use, tell me what to add and I will update it.
-
