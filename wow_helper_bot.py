@@ -86,6 +86,7 @@ class WoWBot(commands.Bot):
     The bot enables message content intents and uses a hybrid command
     prefix for compatibility with both text and slash commands.
     """
+
     def __init__(self):
         intents = discord.Intents.default()
         intents.message_content = True
@@ -118,6 +119,7 @@ class WowHelper(commands.Cog):
     The `data` argument must contain the mappings prepared in ``setup_hook``:
     keys: 'wowhead', 'icy', 'mplus', 'raids'.
     """
+
     def __init__(self, bot, data):
         self.bot = bot
         self.data = data
