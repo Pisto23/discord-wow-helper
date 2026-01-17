@@ -1,4 +1,20 @@
 #!/usr/bin/env python3
+"""WoW Discord helper bot.
+
+Provides slash and hybrid commands to fetch World of Warcraft guides,
+Mythic+ routes, and raid boss information from YAML mapping files.
+
+This module defines a `WoWBot` (a subclass of `commands.Bot`) and a
+`WowHelper` cog which exposes the following commands:
+- `/guide` - lookup class/spec guides from Wowhead and Icy Veins
+- `/mplus` - show Mythic+ route link for a dungeon
+- `/raid`  - show raid boss guide link
+
+Configuration is read from environment variables (via `.env`), and
+mapping files are expected in the `mappings/` directory next to this
+script.
+"""
+
 import os
 import logging
 import asyncio
@@ -21,8 +37,18 @@ BASE_DIR = Path(__file__).parent
 MAPPINGS_DIR = BASE_DIR / "mappings"
 
 
-# ---------- Daten-Loader ----------
+# ---------- Data-Loader ----------
 def safe_load_yaml(path: Path) -> dict:
+    """Load a YAML file from ``path`` and return a dictionary.
+
+    If the file does not exist or is empty, return an empty dictionary.
+
+    Args:
+        path: Path to the YAML file.
+
+    Returns:
+        A dict parsed from YAML or an empty dict on missing/empty file.
+    """
     if not path.exists():
         return {}
     with open(path, "r", encoding="utf-8") as f:
@@ -30,6 +56,20 @@ def safe_load_yaml(path: Path) -> dict:
 
 
 def load_guides(path: Path):
+    """Load guide mappings from a YAML file and return two dicts.
+
+    The YAML is expected to contain top-level mappings for 'wowhead' and
+    'icy_veins'. Each of these should map class names to spec mappings.
+    Returned dictionaries use ``(class, spec)`` tuples as keys (both
+    lowercased) and the guide URL as the value.
+
+    Args:
+        path: Path to the guides YAML file.
+
+    Returns:
+        A tuple ``(wowhead, icy)`` where each element is a dict mapping
+        ``(class, spec)`` -> url.
+    """
     raw = safe_load_yaml(path)
     wowhead, icy = {}, {}
     for src, target in [("wowhead", wowhead), ("icy_veins", icy)]:
@@ -39,15 +79,25 @@ def load_guides(path: Path):
     return wowhead, icy
 
 
-# ---------- Bot Klasse ----------
+# ---------- Bot class ----------
 class WoWBot(commands.Bot):
+    """Discord bot implementation that loads mappings and registers cogs.
+
+    The bot enables message content intents and uses a hybrid command
+    prefix for compatibility with both text and slash commands.
+    """
     def __init__(self):
         intents = discord.Intents.default()
         intents.message_content = True
         super().__init__(command_prefix="!", intents=intents)
 
     async def setup_hook(self):
-        # Daten laden
+        """Asynchronous setup hook used by discord.py to prepare the bot.
+
+        Loads mapping files, registers the `WowHelper` cog and synchronizes
+        application (slash) commands with Discord.
+        """
+        # Load mapping data
         wh, iv = load_guides(MAPPINGS_DIR / "guides.yaml")
         data = {
             "wowhead": wh,
@@ -63,16 +113,26 @@ class WoWBot(commands.Bot):
 
 
 class WowHelper(commands.Cog):
+    """Cog providing commands and autocompletes for WoW resources.
+
+    The `data` argument must contain the mappings prepared in ``setup_hook``:
+    keys: 'wowhead', 'icy', 'mplus', 'raids'.
+    """
     def __init__(self, bot, data):
         self.bot = bot
         self.data = data
         self.all_classes = sorted(list(set(k[0] for k in data["wowhead"].keys())))
 
-    # --- Autocomplete Funktionen ---
+    # --- Autocomplete Functions ---
 
     async def klasse_autocomplete(
         self, interaction: discord.Interaction, current: str
     ) -> list[app_commands.Choice[str]]:
+        """Autocomplete handler for class names.
+
+        Filters available classes by the current input (case-insensitive)
+        and returns up to 25 choices.
+        """
         return [
             app_commands.Choice(name=cls.title(), value=cls)
             for cls in self.all_classes
@@ -82,6 +142,11 @@ class WowHelper(commands.Cog):
     async def spec_autocomplete(
         self, interaction: discord.Interaction, current: str
     ) -> list[app_commands.Choice[str]]:
+        """Autocomplete handler for specialization names.
+
+        Uses the selected class from the interaction namespace to limit
+        available specs. Returns up to 25 choices filtered by `current`.
+        """
         selected_class = interaction.namespace.klasse
         if not selected_class:
             return []
@@ -97,6 +162,7 @@ class WowHelper(commands.Cog):
     async def dungeon_autocomplete(
         self, interaction: discord.Interaction, current: str
     ) -> list[app_commands.Choice[str]]:
+        """Autocomplete for Mythic+ dungeons by name or slug."""
         return [
             app_commands.Choice(name=d["name"], value=slug)
             for slug, d in self.data["mplus"].items()
@@ -106,6 +172,7 @@ class WowHelper(commands.Cog):
     async def raid_autocomplete(
         self, interaction: discord.Interaction, current: str
     ) -> list[app_commands.Choice[str]]:
+        """Autocomplete for raid bosses by name or slug."""
         return [
             app_commands.Choice(name=b["name"], value=slug)
             for slug, b in self.data["raids"].items()
@@ -122,6 +189,12 @@ class WowHelper(commands.Cog):
     )
     @app_commands.autocomplete(klasse=klasse_autocomplete, spec=spec_autocomplete)
     async def guide(self, ctx: commands.Context, klasse: str, spec: str):
+        """Hybrid command to show guides for a given class and spec.
+
+        Parameters reflect the user's chosen `klasse` and `spec` and the
+        function will reply with links found in the loaded mappings. If no
+        guide exists the user is informed.
+        """
         k, s = klasse.lower(), spec.lower()
         key = (k, s)
         if key not in self.data["wowhead"] and key not in self.data["icy"]:
@@ -151,6 +224,11 @@ class WowHelper(commands.Cog):
     @app_commands.describe(dungeon="Wähle den Dungeon")
     @app_commands.autocomplete(dungeon=dungeon_autocomplete)
     async def mplus(self, ctx: commands.Context, dungeon: str):
+        """Show Mythic+ route link for the requested dungeon.
+
+        If the dungeon slug or name is not known, the user receives an
+        ephemeral error message.
+        """
         d_data = self.data["mplus"].get(dungeon.lower())
         if not d_data:
             await ctx.send(f"Dungeon `{dungeon}` nicht gefunden.", ephemeral=True)
@@ -165,6 +243,10 @@ class WowHelper(commands.Cog):
     @app_commands.describe(boss="Wähle den Boss")
     @app_commands.autocomplete(boss=raid_autocomplete)
     async def raid(self, ctx: commands.Context, boss: str):
+        """Show raid boss information and a guide link for the chosen boss.
+
+        If the boss is unknown the user receives an ephemeral error message.
+        """
         b_data = self.data["raids"].get(boss.lower())
         if not b_data:
             await ctx.send(f"Boss `{boss}` nicht gefunden.", ephemeral=True)
@@ -179,6 +261,7 @@ class WowHelper(commands.Cog):
 
 
 async def main():
+    """Create and run the WoW bot using the configured token."""
     bot = WoWBot()
     async with bot:
         await bot.start(TOKEN)
