@@ -1,9 +1,9 @@
 raid_class_guides:
   # ToDo: Update links from archon.gg
   death_knight:
-    blood: https://www.wowhead.com/guide/classes/death-knight/blood/overview-pve-tank
-    frost: https://www.wowhead.com/guide/classes/death-knight/frost/overview-pve-dps
-    unholy: https://www.wowhead.com/guide/classes/death-knight/unholy/overview-pve-dps
+    blood: https://www.archon.gg/wow/builds/blood/death-knight/raid/overview/mythic/all-bosses
+    frost: https://www.archon.gg/wow/builds/frost/death-knight/raid/overview/mythic/all-bosses
+    unholy: https://www.archon.gg/wow/builds/unholy/death-knight/raid/overview/mythic/all-bosses
   demon_hunter:
     devourer: # needs to be updated as soon as available
     havoc: https://www.wowhead.com/guide/classes/death-knight/unholy/overview-pve-dps
