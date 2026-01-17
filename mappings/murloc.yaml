@@ -45,9 +45,9 @@ mplus_class_guides:
     enhancement: https://www.wowhead.com/guide/classes/shaman/enhancement/overview-pve-dps
     restoration: https://www.wowhead.com/guide/classes/shaman/restoration/overview-pve-healer
   warlock:
-    affliction: https://www.wowhead.com/guide/classes/warlock/affliction/overview-pve-dps
-    demonology: https://www.wowhead.com/guide/classes/warlock/demonology/overview-pve-dps
-    destruction: https://www.wowhead.com/guide/classes/warlock/destruction/overview-pve-dps
+    affliction: https://murlok.io/warlock/affliction/m+
+    demonology: https://murlok.io/warlock/demonology/m+
+    destruction: https://murlok.io/warlock/destruction/m+
   warrior:
     arms: https://www.wowhead.com/guide/classes/warrior/arms/overview-pve-dps
     fury: https://www.wowhead.com/guide/classes/warrior/fury/overview-pve-dps

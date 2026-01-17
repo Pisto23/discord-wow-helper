@@ -1,3 +1,4 @@
+# ...existing code...
 #!/usr/bin/env python3
 """WoW Discord helper bot.
 
@@ -7,7 +8,7 @@ Mythic+ routes, and raid boss information from YAML mapping files.
 This module defines a `WoWBot` (a subclass of `commands.Bot`) and a
 `WowHelper` cog which exposes the following commands:
 - `/guide` - lookup class/spec guides from Wowhead and Icy Veins
-- `/mplus` - show Mythic+ route link for a dungeon
+- `/mplus` - show Mythic+ route link for a dungeon or show classes from murloc
 - `/raid`  - show raid boss guide link
 
 Configuration is read from environment variables (via `.env`), and
@@ -100,10 +101,25 @@ class WoWBot(commands.Bot):
         """
         # Load mapping data
         wh, iv = load_guides(MAPPINGS_DIR / "guides.yaml")
+        mplus_routes = safe_load_yaml(MAPPINGS_DIR / "mplus-routes.yaml").get(
+            "dungeons", {}
+        )
+        murloc_raw = safe_load_yaml(MAPPINGS_DIR / "murloc.yaml")
+        if isinstance(murloc_raw, dict):
+            if "classes" in murloc_raw:
+                murloc = murloc_raw["classes"]
+            elif "mplus_class_guides" in murloc_raw:
+                murloc = murloc_raw["mplus_class_guides"]
+            else:
+                murloc = murloc_raw
+        else:
+            murloc = {}
+
         data = {
             "wowhead": wh,
             "icy": iv,
-            "mplus": safe_load_yaml(MAPPINGS_DIR / "mplus.yaml").get("dungeons", {}),
+            "mplus_routes": mplus_routes,
+            "murloc": murloc,
             "raids": safe_load_yaml(MAPPINGS_DIR / "raid.yaml").get("bosses", {}),
         }
         await self.add_cog(WowHelper(self, data))
@@ -117,7 +133,7 @@ class WowHelper(commands.Cog):
     """Cog providing commands and autocompletes for WoW resources.
 
     The `data` argument must contain the mappings prepared in ``setup_hook``:
-    keys: 'wowhead', 'icy', 'mplus', 'raids'.
+    keys: 'wowhead', 'icy', 'mplus_routes', 'murloc', 'raids'.
     """
 
     def __init__(self, bot, data):
@@ -164,10 +180,10 @@ class WowHelper(commands.Cog):
     async def dungeon_autocomplete(
         self, interaction: discord.Interaction, current: str
     ) -> list[app_commands.Choice[str]]:
-        """Autocomplete for Mythic+ dungeons by name or slug."""
+        """Autocomplete for Mythic+ dungeons by name or slug (legacy)."""
         return [
             app_commands.Choice(name=d["name"], value=slug)
-            for slug, d in self.data["mplus"].items()
+            for slug, d in self.data["mplus_routes"].items()
             if current.lower() in d["name"].lower() or current.lower() in slug.lower()
         ][:25]
 
@@ -180,6 +196,47 @@ class WowHelper(commands.Cog):
             for slug, b in self.data["raids"].items()
             if current.lower() in b["name"].lower() or current.lower() in slug.lower()
         ][:25]
+
+    async def murloc_autocomplete(
+        self, interaction: discord.Interaction, current: str
+    ) -> list[app_commands.Choice[str]]:
+        """Autocomplete for murloc classes or entries by name or slug."""
+        m = self.data.get("murloc", {}) or {}
+        choices = []
+        for slug, val in m.items():
+            if isinstance(val, dict):
+                name = val.get("name") or slug.replace("_", " ").title()
+            else:
+                name = str(val)
+            if current.lower() in name.lower() or current.lower() in slug.lower():
+                choices.append(app_commands.Choice(name=name, value=slug))
+        return choices[:25]
+
+    async def mplus_item_autocomplete(
+        self, interaction: discord.Interaction, current: str
+    ) -> list[app_commands.Choice[str]]:
+        """Autocomplete for the second parameter of /mplus.
+
+        Determines which mapping to search based on the selected `source`
+        (may be a plain string or app_commands.Choice in different contexts).
+        """
+        source = getattr(interaction.namespace, "source", None)
+        # normalize source to plain string (handle Choice or None)
+        if isinstance(source, app_commands.Choice):
+            src = source.value
+        else:
+            src = str(source) if source is not None else ""
+
+        if src == "routes":
+            return [
+                app_commands.Choice(name=d.get("name", slug), value=slug)
+                for slug, d in self.data.get("mplus_routes", {}).items()
+                if current.lower() in (d.get("name", "") or slug).lower()
+                or current.lower() in slug.lower()
+            ][:25]
+        if src == "murloc":
+            return await self.murloc_autocomplete(interaction, current)
+        return []
 
     # --- Commands ---
 
@@ -221,25 +278,87 @@ class WowHelper(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.hybrid_command(
-        name="mplus", description="Zeigt die M+ Route für einen Dungeon"
+        name="mplus", description="Zeigt M+ Routes oder Murloc Klassen"
     )
-    @app_commands.describe(dungeon="Wähle den Dungeon")
-    @app_commands.autocomplete(dungeon=dungeon_autocomplete)
-    async def mplus(self, ctx: commands.Context, dungeon: str):
-        """Show Mythic+ route link for the requested dungeon.
+    @app_commands.describe(
+        source="Wähle 'routes' oder 'murloc'", item="Route oder Klasse"
+    )
+    @app_commands.choices(
+        source=[
+            app_commands.Choice(name="Routes (mplus-routes.yaml)", value="routes"),
+            app_commands.Choice(name="Murloc Classes (murloc.yaml)", value="murloc"),
+        ]
+    )
+    @app_commands.autocomplete(item=mplus_item_autocomplete)
+    async def mplus(self, ctx: commands.Context, source: str, item: str):
+        """Show either a Mythic+ route (from mplus-routes.yaml) or a Murloc class entry.
 
-        If the dungeon slug or name is not known, the user receives an
-        ephemeral error message.
+        /mplus asks for a source (routes or murloc) and then an item selected
+        from an autocomplete list for that source.
         """
-        d_data = self.data["mplus"].get(dungeon.lower())
-        if not d_data:
-            await ctx.send(f"Dungeon `{dungeon}` nicht gefunden.", ephemeral=True)
+        src = str(source)
+
+        if src == "routes":
+            # item is expected to be the dungeon slug (e.g. 'hoa'); try both raw and lowercased
+            d_data = self.data.get("mplus_routes", {}).get(item) or self.data.get(
+                "mplus_routes", {}
+            ).get((item or "").lower())
+            if not d_data:
+                await ctx.send(f"Dungeon `{item}` nicht gefunden.", ephemeral=True)
+                return
+            embed = discord.Embed(
+                title=f"M+ Route: {d_data.get('name', item)}",
+                color=discord.Color.green(),
+            )
+            embed.add_field(
+                name="Route Link", value=f"[Hier klicken]({d_data.get('url', '')})"
+            )
+            await ctx.send(embed=embed)
             return
-        embed = discord.Embed(
-            title=f"M+ Route: {d_data['name']}", color=discord.Color.green()
-        )
-        embed.add_field(name="Route Link", value=f"[Hier klicken]({d_data['url']})")
-        await ctx.send(embed=embed)
+
+        if src == "murloc":
+            c_data = self.data.get("murloc", {}).get(item) or self.data.get(
+                "murloc", {}
+            ).get((item or "").lower())
+            if not c_data:
+                await ctx.send(f"Eintrag `{item}` nicht gefunden.", ephemeral=True)
+                return
+
+            if isinstance(c_data, dict):
+                # If values are URLs (spec -> url), list them
+                if any(
+                    isinstance(v, str) and v.startswith("http") for v in c_data.values()
+                ):
+                    embed = discord.Embed(
+                        title=f"Class Guides: {item.replace('_', ' ').title()}",
+                        color=discord.Color.teal(),
+                    )
+                    for spec, url in sorted(c_data.items()):
+                        if isinstance(url, str) and url.startswith("http"):
+                            embed.add_field(
+                                name=spec.title(), value=f"[Guide]({url})", inline=False
+                            )
+                    await ctx.send(embed=embed)
+                    return
+
+                # Fallback: dict with 'name'/'url'
+                name = c_data.get("name", item.replace("_", " ").title())
+                url = c_data.get("url")
+                embed = discord.Embed(
+                    title=f"Murloc: {name}", color=discord.Color.teal()
+                )
+                if url:
+                    embed.add_field(name="Link", value=f"[Hier klicken]({url})")
+                await ctx.send(embed=embed)
+                return
+
+            # Simple string entry
+            name = str(c_data)
+            embed = discord.Embed(title=f"Murloc: {name}", color=discord.Color.teal())
+            await ctx.send(embed=embed)
+            return
+
+        await ctx.send("Ungültige Quelle gewählt.", ephemeral=True)
 
     @commands.hybrid_command(name="raid", description="Zeigt Boss-Infos aus dem Raid")
     @app_commands.describe(boss="Wähle den Boss")
