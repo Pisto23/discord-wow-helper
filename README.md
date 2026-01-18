@@ -17,10 +17,11 @@ A small Discord helper bot for World of Warcraft that answers quick questions an
 The bot loads mapping files from the `mappings/` directory. By default it expects:
 
 - `guides.yaml` — maps classes and specs to Wowhead / Icy Veins guide URLs.
-- `mplus.yaml` — maps dungeon slugs to route names and URLs.
-- `raids.yaml` — maps raid boss slugs to names and MythicTrap (or other) URLs.
+- `mplus-routes.yaml` — maps dungeon slugs to route names and URLs.
+- `murloc.yaml` — optional mappings for Murloc class guides or single-entry items.
+- `raid.yaml` — maps raid boss slugs to names and MythicTrap (or other) URLs.
 
-If your YAML files use different names (for example `raid.yaml`), rename them to the expected filenames or update the code constants in `wow_helper_bot.py`.
+If your YAML files use different names (for example `mplus.yaml` or `raids.yaml`), rename them to the expected filenames or update the code constants in [wow_helper_bot.py](wow_helper_bot.py).
 
 ## Quick start
 
@@ -55,8 +56,8 @@ The bot will log in and begin responding in any server where it is invited and h
 
 - `/guide class <klasse> <spec>` — explicit guide lookup.
 	- Example: `/guide class paladin prot`
-- `/mplus route <dungeon_slug>` — posts a route link for a dungeon.
-	- Example: `/mplus route hoa`
+- `/mplus <source> <item>` — posts a route link (`source=routes`) or shows Murloc class/entry info (`source=murloc`).
+	- Examples: `/mplus routes hoa` and `/mplus murloc paladin`
 - `/raid <boss_slug>` — posts raid/boss info link.
 	- Example: `/raid dimensius`
 
@@ -68,8 +69,8 @@ Open the YAML files in `mappings/` to add or update entries. The loader function
 
 ## Development
 
-- Code entry point: `wow_helper_bot.py`
-- Main settings: `DISCORD_BOT_TOKEN` in .env file
+- Code entry point: [wow_helper_bot.py](wow_helper_bot.py)
+- Main settings: `DISCORD_TOKEN` in .env file
 - Mapping directory: `mappings/`
 
 To run locally for development, follow the Quick start and edit the YAML files or Python code as needed.
