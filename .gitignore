@@ -1,5 +1,10 @@
 .venv/
 .env
-__pychace__/
+__pycache__/
 *.pyc
 .ruff-cache/
+
+# Build artifacts
+*.egg-info/
+dist/
+build/

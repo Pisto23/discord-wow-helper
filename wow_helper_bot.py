@@ -15,15 +15,15 @@ mapping files are expected in the `mappings/` directory next to this
 script.
 """
 
-import os
-import logging
 import asyncio
+import logging
+import os
 from pathlib import Path
 
 import discord
-from discord.ext import commands
-from discord import app_commands
 import yaml
+from discord import app_commands
+from discord.ext import commands
 from dotenv import load_dotenv
 
 # Configuration
@@ -114,6 +114,11 @@ class WoWBot(commands.Bot):
     """
 
     def __init__(self):
+        """Initialize the WoW bot with message content intents and command prefix.
+
+        Sets up the bot with default Discord intents plus message_content enabled,
+        and configures the hybrid command prefix as "!".
+        """
         intents = discord.Intents.default()
         intents.message_content = True
         super().__init__(command_prefix="!", intents=intents)
@@ -172,6 +177,13 @@ class WowHelper(commands.Cog):
     """
 
     def __init__(self, bot: commands.Bot, data: dict[str, dict]):
+        """Initialize the WowHelper cog with bot instance and mapping data.
+
+        Args:
+            bot: The Discord bot instance this cog is attached to.
+            data: Dictionary containing WoW resource mappings with keys:
+                'wowhead', 'icy', 'mplus_routes', 'murloc', 'raids'.
+        """
         self.bot = bot
         self.data = data
         self.all_classes = sorted(list(set(k[0] for k in data["wowhead"].keys())))

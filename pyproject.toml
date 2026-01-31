@@ -1,0 +1,55 @@
+[project]
+name = "discord-wow-helper"
+version = "1.0.0"
+description = "Discord bot for World of Warcraft guides and resources"
+requires-python = ">=3.11"
+dependencies = [
+    "discord.py>=2.3.2",
+    "python-dotenv>=1.0.0",
+    "PyYAML>=6.0.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.8.0",
+]
+
+[tool.ruff]
+# Set the maximum line length to 100 characters
+line-length = 100
+
+# Assume Python 3.11
+target-version = "py311"
+
+[tool.ruff.lint]
+# Enable pydocstyle (D) rules for docstring checks
+# Also include other useful rule sets
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "D",   # pydocstyle (docstring checks)
+]
+
+# Ignore specific rules if needed
+ignore = [
+    "D203",  # 1 blank line required before class docstring (conflicts with D211)
+    "D213",  # Multi-line docstring summary should start at the second line (conflicts with D212)
+]
+
+[tool.ruff.lint.pydocstyle]
+# Use Google-style docstrings (matches your existing style)
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+# Don't require docstrings in test files (if you add them later)
+"test_*.py" = ["D"]
+"*_test.py" = ["D"]
+
+[tool.ruff.format]
+# Use double quotes for strings
+quote-style = "double"
+
+# Indent with 4 spaces
+indent-style = "space"
