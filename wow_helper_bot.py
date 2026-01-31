@@ -27,15 +27,29 @@ from discord import app_commands
 import yaml
 from dotenv import load_dotenv
 
-# Konfiguration
+# Configuration
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
+
+if not TOKEN:
+    raise ValueError(
+        "DISCORD_TOKEN not found in environment. "
+        "Please set it in your .env file or environment variables."
+    )
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(message)s")
 logger = logging.getLogger("wow-bot")
 
 BASE_DIR = Path(__file__).parent
 MAPPINGS_DIR = BASE_DIR / "mappings"
+
+# Mapping file keys
+KEY_WOWHEAD = "wowhead"
+KEY_ICY_VEINS = "icy_veins"
+KEY_CLASSES = "classes"
+KEY_MPLUS_GUIDES = "mplus_class_guides"
+KEY_DUNGEONS = "dungeons"
+KEY_BOSSES = "bosses"
 
 
 # ---------- Data-Loader ----------
@@ -51,12 +65,24 @@ def safe_load_yaml(path: Path) -> dict:
         A dict parsed from YAML or an empty dict on missing/empty file.
     """
     if not path.exists():
+        logger.warning(f"YAML file not found: {path}")
         return {}
-    with open(path, "r", encoding="utf-8") as f:
-        return yaml.safe_load(f) or {}
+
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f)
+            return data if isinstance(data, dict) else {}
+    except yaml.YAMLError as e:
+        logger.error(f"Failed to parse YAML file {path}: {e}")
+        return {}
+    except Exception as e:
+        logger.error(f"Error reading file {path}: {e}")
+        return {}
 
 
-def load_guides(path: Path):
+def load_guides(
+    path: Path,
+) -> tuple[dict[tuple[str, str], str], dict[tuple[str, str], str]]:
     """Load guide mappings from a YAML file and return two dicts.
 
     The YAML is expected to contain top-level mappings for 'wowhead' and
@@ -73,7 +99,7 @@ def load_guides(path: Path):
     """
     raw = safe_load_yaml(path)
     wowhead, icy = {}, {}
-    for src, target in [("wowhead", wowhead), ("icy_veins", icy)]:
+    for src, target in [(KEY_WOWHEAD, wowhead), (KEY_ICY_VEINS, icy)]:
         for cls, specs in (raw.get(src, {}) or {}).items():
             for spec, url in (specs or {}).items():
                 target[(cls.lower(), spec.lower())] = url
@@ -99,19 +125,22 @@ class WoWBot(commands.Bot):
         Loads mapping files, registers the `WowHelper` cog and synchronizes
         application (slash) commands with Discord.
         """
+        logger.info("Loading mapping files...")
+
         # Load mapping data
         wh, iv = load_guides(MAPPINGS_DIR / "guides.yaml")
         mplus_routes = safe_load_yaml(MAPPINGS_DIR / "mplus-routes.yaml").get(
-            "dungeons", {}
+            KEY_DUNGEONS, {}
         )
         murloc_raw = safe_load_yaml(MAPPINGS_DIR / "murloc.yaml")
+
+        # Extract murloc data from various possible structures
         if isinstance(murloc_raw, dict):
-            if "classes" in murloc_raw:
-                murloc = murloc_raw["classes"]
-            elif "mplus_class_guides" in murloc_raw:
-                murloc = murloc_raw["mplus_class_guides"]
-            else:
-                murloc = murloc_raw
+            murloc = (
+                murloc_raw.get(KEY_CLASSES)
+                or murloc_raw.get(KEY_MPLUS_GUIDES)
+                or murloc_raw
+            )
         else:
             murloc = {}
 
@@ -120,13 +149,20 @@ class WoWBot(commands.Bot):
             "icy": iv,
             "mplus_routes": mplus_routes,
             "murloc": murloc,
-            "raids": safe_load_yaml(MAPPINGS_DIR / "raid.yaml").get("bosses", {}),
+            "raids": safe_load_yaml(MAPPINGS_DIR / "raid.yaml").get(KEY_BOSSES, {}),
         }
+
+        logger.info(f"Loaded {len(wh)} Wowhead guides, {len(iv)} Icy Veins guides")
+        logger.info(
+            f"Loaded {len(mplus_routes)} M+ routes, {len(murloc)} murloc entries"
+        )
+        logger.info(f"Loaded {len(data['raids'])} raid bosses")
+
         await self.add_cog(WowHelper(self, data))
 
-        logger.info("Synchronisiere Slash-Commands mit Discord...")
+        logger.info("Synchronizing slash commands with Discord...")
         await self.tree.sync()
-        logger.info("Synchronisierung fertig!")
+        logger.info("Synchronization complete!")
 
 
 class WowHelper(commands.Cog):
@@ -136,7 +172,7 @@ class WowHelper(commands.Cog):
     keys: 'wowhead', 'icy', 'mplus_routes', 'murloc', 'raids'.
     """
 
-    def __init__(self, bot, data):
+    def __init__(self, bot: commands.Bot, data: dict[str, dict]):
         self.bot = bot
         self.data = data
         self.all_classes = sorted(list(set(k[0] for k in data["wowhead"].keys())))
@@ -317,9 +353,8 @@ class WowHelper(commands.Cog):
             return
 
         if src == "murloc":
-            c_data = self.data.get("murloc", {}).get(item) or self.data.get(
-                "murloc", {}
-            ).get((item or "").lower())
+            murloc_data = self.data.get("murloc", {})
+            c_data = murloc_data.get(item) or murloc_data.get((item or "").lower())
             if not c_data:
                 await ctx.send(f"Eintrag `{item}` nicht gefunden.", ephemeral=True)
                 return
@@ -384,8 +419,16 @@ class WowHelper(commands.Cog):
 async def main():
     """Create and run the WoW bot using the configured token."""
     bot = WoWBot()
-    async with bot:
-        await bot.start(TOKEN)
+    try:
+        async with bot:
+            logger.info("Starting WoW Discord bot...")
+            await bot.start(TOKEN)
+    except discord.LoginFailure:
+        logger.error("Invalid Discord token. Please check your DISCORD_TOKEN.")
+        raise
+    except Exception as e:
+        logger.error(f"Fatal error: {e}")
+        raise
 
 
 if __name__ == "__main__":
