@@ -1,4 +1,3 @@
-# ...existing code...
 #!/usr/bin/env python3
 """WoW Discord helper bot.
 
