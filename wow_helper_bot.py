@@ -80,7 +80,9 @@ def safe_load_yaml(path: Path) -> dict:
         return {}
 
 
-def load_guides(path: Path) -> tuple[dict[tuple[str, str], str], dict[tuple[str, str], str]]:
+def load_guides(
+    path: Path,
+) -> tuple[dict[tuple[str, str], str], dict[tuple[str, str], str]]:
     """Load guide mappings from a YAML file and return two dicts.
 
     The YAML is expected to contain top-level mappings for 'wowhead' and
@@ -151,7 +153,9 @@ class WoWBot(commands.Bot):
         }
 
         logger.info(f"Loaded {len(wh)} Wowhead guides, {len(iv)} Icy Veins guides")
-        logger.info(f"Loaded {len(mplus_routes)} M+ routes, {len(murloc)} murloc entries")
+        logger.info(
+            f"Loaded {len(mplus_routes)} M+ routes, {len(murloc)} murloc entries"
+        )
         logger.info(f"Loaded {len(data['raids'])} raid bosses")
 
         await self.add_cog(WowHelper(self, data))
