@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wow-helper-bot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wow-bot
+  template:
+    metadata:
+      labels:
+        app: wow-bot
+    spec:
+      containers:
+      - name: bot
+        image: localhost/wow-helper-bot:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: DISCORD_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: bot-token
+              key: DISCORD_TOKEN
