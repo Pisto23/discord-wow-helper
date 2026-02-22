@@ -133,18 +133,12 @@ class WoWBot(commands.Bot):
 
         # Load mapping data
         wh, iv = load_guides(MAPPINGS_DIR / "guides.yaml")
-        mplus_routes = safe_load_yaml(MAPPINGS_DIR / "mplus-routes.yaml").get(
-            KEY_DUNGEONS, {}
-        )
+        mplus_routes = safe_load_yaml(MAPPINGS_DIR / "mplus-routes.yaml").get(KEY_DUNGEONS, {})
         murloc_raw = safe_load_yaml(MAPPINGS_DIR / "murloc.yaml")
 
         # Extract murloc data from various possible structures
         if isinstance(murloc_raw, dict):
-            murloc = (
-                murloc_raw.get(KEY_CLASSES)
-                or murloc_raw.get(KEY_MPLUS_GUIDES)
-                or murloc_raw
-            )
+            murloc = murloc_raw.get(KEY_CLASSES) or murloc_raw.get(KEY_MPLUS_GUIDES) or murloc_raw
         else:
             murloc = {}
 
@@ -157,9 +151,7 @@ class WoWBot(commands.Bot):
         }
 
         logger.info(f"Loaded {len(wh)} Wowhead guides, {len(iv)} Icy Veins guides")
-        logger.info(
-            f"Loaded {len(mplus_routes)} M+ routes, {len(murloc)} murloc entries"
-        )
+        logger.info(f"Loaded {len(mplus_routes)} M+ routes, {len(murloc)} murloc entries")
         logger.info(f"Loaded {len(data['raids'])} raid bosses")
 
         await self.add_cog(WowHelper(self, data))
@@ -287,12 +279,8 @@ class WowHelper(commands.Cog):
 
     # --- Commands ---
 
-    @commands.hybrid_command(
-        name="guide", description="Zeigt WoW Guides für Klasse und Spec"
-    )
-    @app_commands.describe(
-        klasse="Wähle deine Klasse", spec="Wähle deine Spezialisierung"
-    )
+    @commands.hybrid_command(name="guide", description="Zeigt WoW Guides für Klasse und Spec")
+    @app_commands.describe(klasse="Wähle deine Klasse", spec="Wähle deine Spezialisierung")
     @app_commands.autocomplete(klasse=klasse_autocomplete, spec=spec_autocomplete)
     async def guide(self, ctx: commands.Context, klasse: str, spec: str):
         """Hybrid command to show guides for a given class and spec.
@@ -307,9 +295,7 @@ class WowHelper(commands.Cog):
             await ctx.send(f"Kein Guide für {klasse} {spec} gefunden.", ephemeral=True)
             return
 
-        embed = discord.Embed(
-            title=f"Guides: {k.title()} {s.title()}", color=discord.Color.blue()
-        )
+        embed = discord.Embed(title=f"Guides: {k.title()} {s.title()}", color=discord.Color.blue())
         if key in self.data["wowhead"]:
             embed.add_field(
                 name="Wowhead",
@@ -324,12 +310,8 @@ class WowHelper(commands.Cog):
             )
         await ctx.send(embed=embed)
 
-    @commands.hybrid_command(
-        name="mplus", description="Zeigt M+ Routes oder Murloc Klassen"
-    )
-    @app_commands.describe(
-        source="Wähle 'routes' oder 'murloc'", item="Route oder Klasse"
-    )
+    @commands.hybrid_command(name="mplus", description="Zeigt M+ Routes oder Murloc Klassen")
+    @app_commands.describe(source="Wähle 'routes' oder 'murloc'", item="Route oder Klasse")
     @app_commands.choices(
         source=[
             app_commands.Choice(name="Routes (mplus-routes.yaml)", value="routes"),
@@ -357,9 +339,7 @@ class WowHelper(commands.Cog):
                 title=f"M+ Route: {d_data.get('name', item)}",
                 color=discord.Color.green(),
             )
-            embed.add_field(
-                name="Route Link", value=f"[Hier klicken]({d_data.get('url', '')})"
-            )
+            embed.add_field(name="Route Link", value=f"[Hier klicken]({d_data.get('url', '')})")
             await ctx.send(embed=embed)
             return
 
@@ -372,9 +352,7 @@ class WowHelper(commands.Cog):
 
             if isinstance(c_data, dict):
                 # If values are URLs (spec -> url), list them
-                if any(
-                    isinstance(v, str) and v.startswith("http") for v in c_data.values()
-                ):
+                if any(isinstance(v, str) and v.startswith("http") for v in c_data.values()):
                     embed = discord.Embed(
                         title=f"Class Guides: {item.replace('_', ' ').title()}",
                         color=discord.Color.teal(),
@@ -390,9 +368,7 @@ class WowHelper(commands.Cog):
                 # Fallback: dict with 'name'/'url'
                 name = c_data.get("name", item.replace("_", " ").title())
                 url = c_data.get("url")
-                embed = discord.Embed(
-                    title=f"Murloc: {name}", color=discord.Color.teal()
-                )
+                embed = discord.Embed(title=f"Murloc: {name}", color=discord.Color.teal())
                 if url:
                     embed.add_field(name="Link", value=f"[Hier klicken]({url})")
                 await ctx.send(embed=embed)
@@ -418,12 +394,8 @@ class WowHelper(commands.Cog):
         if not b_data:
             await ctx.send(f"Boss `{boss}` nicht gefunden.", ephemeral=True)
             return
-        embed = discord.Embed(
-            title=f"Raid Boss: {b_data['name']}", color=discord.Color.red()
-        )
-        embed.add_field(
-            name="Guide Link", value=f"[MythicTrap / Guide]({b_data['url']})"
-        )
+        embed = discord.Embed(title=f"Raid Boss: {b_data['name']}", color=discord.Color.red())
+        embed.add_field(name="Guide Link", value=f"[MythicTrap / Guide]({b_data['url']})")
         await ctx.send(embed=embed)
 
 
