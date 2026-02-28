@@ -6,7 +6,7 @@ Mythic+ routes, and raid boss information from YAML mapping files.
 
 This module defines a `WoWBot` (a subclass of `commands.Bot`) and a
 `WowHelper` cog which exposes the following commands:
-- `/guide` - lookup class/spec guides from Wowhead and Icy Veins
+- `/guide` - lookup class/spec guides from Wowhead, Icy Veins and Archon
 - `/mplus` - show Mythic+ route link for a dungeon or show classes from murloc
 - `/raid`  - show raid boss guide link
 
@@ -142,16 +142,27 @@ class WoWBot(commands.Bot):
         else:
             murloc = {}
 
+        archon_raw = safe_load_yaml(MAPPINGS_DIR / "archon.yaml")
+        archon_data = {
+            "raid": archon_raw.get("raid_class_guides", {}),
+            "mplus": archon_raw.get("mplus", {}),
+        }
+
         data = {
             "wowhead": wh,
             "icy": iv,
             "mplus_routes": mplus_routes,
             "murloc": murloc,
             "raids": safe_load_yaml(MAPPINGS_DIR / "raid.yaml").get(KEY_BOSSES, {}),
+            "archon": archon_data,
         }
 
         logger.info(f"Loaded {len(wh)} Wowhead guides, {len(iv)} Icy Veins guides")
         logger.info(f"Loaded {len(mplus_routes)} M+ routes, {len(murloc)} murloc entries")
+        logger.info(
+            f"Loaded {len(archon_data['raid'])} archon raid classes, "
+            f"{len(archon_data['mplus'])} archon M+ classes"
+        )
         logger.info(f"Loaded {len(data['raids'])} raid bosses")
 
         await self.add_cog(WowHelper(self, data))
@@ -251,6 +262,17 @@ class WowHelper(commands.Cog):
                 choices.append(app_commands.Choice(name=name, value=slug))
         return choices[:25]
 
+    async def archon_mplus_klasse_autocomplete(
+        self, interaction: discord.Interaction, current: str
+    ) -> list[app_commands.Choice[str]]:
+        """Autocomplete for Archon M+ class names."""
+        classes = self.data.get("archon", {}).get("mplus", {})
+        return [
+            app_commands.Choice(name=cls.replace("_", " ").title(), value=cls)
+            for cls in sorted(classes.keys())
+            if current.lower() in cls.lower()
+        ][:25]
+
     async def mplus_item_autocomplete(
         self, interaction: discord.Interaction, current: str
     ) -> list[app_commands.Choice[str]]:
@@ -275,6 +297,8 @@ class WowHelper(commands.Cog):
             ][:25]
         if src == "murloc":
             return await self.murloc_autocomplete(interaction, current)
+        if src == "archon":
+            return await self.archon_mplus_klasse_autocomplete(interaction, current)
         return []
 
     # --- Commands ---
@@ -291,7 +315,8 @@ class WowHelper(commands.Cog):
         """
         k, s = klasse.lower(), spec.lower()
         key = (k, s)
-        if key not in self.data["wowhead"] and key not in self.data["icy"]:
+        archon_url = self.data.get("archon", {}).get("raid", {}).get(k, {}).get(s)
+        if key not in self.data["wowhead"] and key not in self.data["icy"] and not archon_url:
             await ctx.send(f"Kein Guide für {klasse} {spec} gefunden.", ephemeral=True)
             return
 
@@ -308,14 +333,23 @@ class WowHelper(commands.Cog):
                 value=f"[Zum Guide]({self.data['icy'][key]})",
                 inline=False,
             )
+        if archon_url:
+            embed.add_field(
+                name="Archon.gg",
+                value=f"[Zum Guide]({archon_url})",
+                inline=False,
+            )
         await ctx.send(embed=embed)
 
-    @commands.hybrid_command(name="mplus", description="Zeigt M+ Routes oder Murloc Klassen")
-    @app_commands.describe(source="Wähle 'routes' oder 'murloc'", item="Route oder Klasse")
+    @commands.hybrid_command(
+        name="mplus", description="Zeigt M+ Routes, Murloc Klassen oder Archon Builds"
+    )
+    @app_commands.describe(source="Wähle eine Quelle", item="Route, Klasse oder Dungeon")
     @app_commands.choices(
         source=[
             app_commands.Choice(name="Routes (mplus-routes.yaml)", value="routes"),
             app_commands.Choice(name="Murloc Classes (murloc.yaml)", value="murloc"),
+            app_commands.Choice(name="Archon.gg M+ Builds", value="archon"),
         ]
     )
     @app_commands.autocomplete(item=mplus_item_autocomplete)
@@ -377,6 +411,26 @@ class WowHelper(commands.Cog):
             # Simple string entry
             name = str(c_data)
             embed = discord.Embed(title=f"Murloc: {name}", color=discord.Color.teal())
+            await ctx.send(embed=embed)
+            return
+
+        if src == "archon":
+            archon_mplus = self.data.get("archon", {}).get("mplus", {})
+            cls_data = archon_mplus.get(item) or archon_mplus.get((item or "").lower())
+            if not cls_data:
+                await ctx.send(f"Klasse `{item}` nicht gefunden.", ephemeral=True)
+                return
+            embed = discord.Embed(
+                title=f"Archon.gg M+: {item.replace('_', ' ').title()}",
+                color=discord.Color.purple(),
+            )
+            for spec, url in sorted(cls_data.items()):
+                if isinstance(url, str) and url.startswith("http"):
+                    embed.add_field(
+                        name=spec.replace("_", " ").title(),
+                        value=f"[Archon.gg]({url})",
+                        inline=False,
+                    )
             await ctx.send(embed=embed)
             return
 
