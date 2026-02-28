@@ -1,54 +1,54 @@
 mplus_class_guides:
   death_knight:
-    blood: https://www.wowhead.com/guide/classes/death-knight/blood/overview-pve-tank
-    frost: https://www.wowhead.com/guide/classes/death-knight/frost/overview-pve-dps
-    unholy: https://www.wowhead.com/guide/classes/death-knight/unholy/overview-pve-dps
+    blood: https://murlok.io/death-knight/blood/m+
+    frost: https://murlok.io/death-knight/frost/m+
+    unholy: https://murlok.io/death-knight/unholy/m+
   demon_hunter:
-    devourer: # needs to be updated as soon as available
-    havoc: https://www.wowhead.com/guide/classes/death-knight/unholy/overview-pve-dps
-    Vengeance: https://www.wowhead.com/guide/classes/demon-hunter/vengeance/overview-pve-tank
+    devourer: https://murlok.io/demon-hunter/devourer/m+
+    havoc: https://murlok.io/demon-hunter/havoc/m+
+    Vengeance: https://murlok.io/demon-hunter/vengeance/m+
   druid:
-    balance: https://www.wowhead.com/guide/classes/druid/balance/overview-pve-dps
-    feral: https://www.wowhead.com/guide/classes/druid/balance/overview-pve-dps
-    guardian: https://www.wowhead.com/guide/classes/druid/guardian/overview-pve-tank
-    restoration: https://www.wowhead.com/guide/classes/druid/restoration/overview-pve-healer
+    balance: https://murlok.io/druid/balance/m+
+    feral: https://murlok.io/druid/feral/m+
+    guardian: https://murlok.io/druid/guardian/m+
+    restoration: https://murlok.io/druid/restoration/m+
   evoker:
-    augmentation: https://www.wowhead.com/guide/classes/evoker/augmentation/overview-pve-dps
-    devestation: https://www.wowhead.com/guide/classes/evoker/devastation/overview-pve-dps
-    preservation: https://www.wowhead.com/guide/classes/evoker/preservation/overview-pve-healer
+    augmentation: https://murlok.io/evoker/augmentation/m+
+    devestation: https://murlok.io/evoker/devastation/m+
+    preservation: https://murlok.io/evoker/preservation/m+
   hunter:
-    beast_mastery: https://www.wowhead.com/guide/classes/hunter/beast-mastery/overview-pve-dps
-    marksmanship: https://www.wowhead.com/guide/classes/hunter/marksmanship/overview-pve-dps
-    survival: https://www.wowhead.com/guide/classes/hunter/survival/overview-pve-dps
+    beast_mastery: https://murlok.io/hunter/beast-mastery/m+
+    marksmanship: https://murlok.io/hunter/marksmanship/m+
+    survival: https://murlok.io/hunter/survival/m+
   mage:
-    arcane: https://www.wowhead.com/guide/classes/mage/arcane/overview-pve-dps
-    fire: https://www.wowhead.com/guide/classes/mage/fire/overview-pve-dps
-    frost: https://www.wowhead.com/guide/classes/mage/frost/overview-pve-dps
+    arcane: https://murlok.io/mage/arcane/m+
+    fire: https://murlok.io/mage/fire/m+
+    frost: https://murlok.io/mage/frost/m+
   monk:
-    brewmaster: https://www.wowhead.com/guide/classes/monk/brewmaster/overview-pve-tank
-    mistweaver: https://www.wowhead.com/guide/classes/monk/mistweaver/overview-pve-healer
-    windwalker: https://www.wowhead.com/guide/classes/monk/windwalker/overview-pve-dps
+    brewmaster: https://murlok.io/monk/brewmaster/m+
+    mistweaver: https://murlok.io/monk/mistweaver/m+
+    windwalker: https://murlok.io/monk/windwalker/m+
   paladin:
-    holy: https://www.wowhead.com/guide/classes/paladin/holy/overview-pve-healer
-    protection: https://www.wowhead.com/guide/classes/paladin/protection/overview-pve-tank
-    retribution: https://www.wowhead.com/guide/classes/paladin/retribution/overview-pve-dps
+    holy: https://murlok.io/paladin/holy/m+
+    protection: https://murlok.io/paladin/protection/m+
+    retribution: https://murlok.io/paladin/retribution/m+
   priest:
-    discipline: https://www.wowhead.com/guide/classes/priest/discipline/overview-pve-healer
-    holy: https://www.wowhead.com/guide/classes/priest/holy/overview-pve-healer
-    shadow: https://www.wowhead.com/guide/classes/priest/shadow/overview-pve-dps
+    discipline: https://murlok.io/priest/discipline/m+
+    holy: https://murlok.io/priest/holy/m+
+    shadow: https://murlok.io/priest/shadow/m+
   rouge:
-    assassionation: https://www.wowhead.com/guide/classes/rogue/assassination/overview-pve-dps
-    outlaw: https://www.wowhead.com/guide/classes/rogue/outlaw/overview-pve-dps
-    subtlety: https://www.wowhead.com/guide/classes/rogue/outlaw/overview-pve-dps
+    assassionation: https://murlok.io/rogue/assassination/m+
+    outlaw: https://murlok.io/rogue/outlaw/m+
+    subtlety: https://murlok.io/rogue/subtlety/m+
   shaman:
-    elemental: https://www.wowhead.com/guide/classes/shaman/elemental/overview-pve-dps
-    enhancement: https://www.wowhead.com/guide/classes/shaman/enhancement/overview-pve-dps
-    restoration: https://www.wowhead.com/guide/classes/shaman/restoration/overview-pve-healer
+    elemental: https://murlok.io/shaman/elemental/m+
+    enhancement: https://murlok.io/shaman/enhancement/m+
+    restoration: https://murlok.io/shaman/restoration/m+
   warlock:
     affliction: https://murlok.io/warlock/affliction/m+
     demonology: https://murlok.io/warlock/demonology/m+
     destruction: https://murlok.io/warlock/destruction/m+
   warrior:
-    arms: https://www.wowhead.com/guide/classes/warrior/arms/overview-pve-dps
-    fury: https://www.wowhead.com/guide/classes/warrior/fury/overview-pve-dps
-    protection: https://www.wowhead.com/guide/classes/warrior/protection/overview-pve-tank
+    arms: https://murlok.io/warrior/arms/m+
+    fury: https://murlok.io/warrior/fury/m+
+    protection: https://murlok.io/warrior/protection/m+

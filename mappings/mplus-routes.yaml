@@ -1,23 +1,25 @@
 dungeons:
-  hoa:
-    name: Halls of Atonement
-    url: https://keystone.guru/routes/retail/halls-of-atonement
-  gambit:
-    name: Tazavesh So'Leahs - Gambit
-    url: https://keystone.guru/routes/retail/tazavesh-so-leahs-gambit
-  streets:
-    name: Tazavesh So'Leahs - Streets
-    url: https://keystone.guru/routes/retail/tazavesh-streets-of-wonder
-  arak:
-    name: Ara Kara City of Echoes
-    url: https://keystone.guru/routes/retail/ara-kara-city-of-echoes
-  flood:
-    name: Operation - Floodgate
-    url: https://keystone.guru/routes/retail/operation-floodgate
-  priory:
-    name: Priory of the Sacred Flame
-    url: https://keystone.guru/routes/retail/priory-of-the-sacred-flame
-  dawn:
-    name: The Dawnbreaker
-    url: https://keystone.guru/routes/retail/the-dawnbreaker
-    
+  pos:
+    name: Pit of Saron
+    url: https://keystone.guru/routes/retail/pit-of-saron
+  academy:
+    name: Algeth'ar Academy
+    url: https://keystone.guru/routes/retail/algethar-academy
+  skyreach:
+    name: Skyreach
+    url: https://keystone.guru/routes/retail/skyreach
+  triumvirat:
+    name: Seat of the Triumvirate
+    url: https://keystone.guru/routes/retail/seat-of-the-triumvirate
+  terrace:
+    name: Magister's Terrace
+    url: https://keystone.guru/routes/retail/magisters-terrace
+  caverns:
+    name: Maisara Caverns
+    url: https://keystone.guru/routes/retail/maisara-caverns
+  nexuspoint:
+    name: Nexuspoint Xenas
+    url: https://keystone.guru/routes/retail/nexuspoint-xenas
+  spire:
+    name: Windrunner Spire
+    url: https://keystone.guru/routes/retail/windrunner-spire

@@ -1,109 +1,108 @@
 raid_class_guides:
-  # ToDo: Update links from archon.gg
   death_knight:
     blood: https://www.archon.gg/wow/builds/blood/death-knight/raid/overview/mythic/all-bosses
     frost: https://www.archon.gg/wow/builds/frost/death-knight/raid/overview/mythic/all-bosses
     unholy: https://www.archon.gg/wow/builds/unholy/death-knight/raid/overview/mythic/all-bosses
   demon_hunter:
-    devourer: # needs to be updated as soon as available
-    havoc: https://www.wowhead.com/guide/classes/death-knight/unholy/overview-pve-dps
-    Vengeance: https://www.wowhead.com/guide/classes/demon-hunter/vengeance/overview-pve-tank
+    devourer: https://www.archon.gg/wow/builds/devourer/demon-hunter/raid/overview/mythic/all-bosses
+    havoc: https://www.archon.gg/wow/builds/havoc/demon-hunter/raid/overview/mythic/all-bosses
+    Vengeance: https://www.archon.gg/wow/builds/vengeance/demon-hunter/raid/overview/mythic/all-bosses
   druid:
-    balance: https://www.wowhead.com/guide/classes/druid/balance/overview-pve-dps
-    feral: https://www.wowhead.com/guide/classes/druid/balance/overview-pve-dps
-    guardian: https://www.wowhead.com/guide/classes/druid/guardian/overview-pve-tank
-    restoration: https://www.wowhead.com/guide/classes/druid/restoration/overview-pve-healer
+    balance: https://www.archon.gg/wow/builds/balance/druid/raid/overview/mythic/all-bosses
+    feral: https://www.archon.gg/wow/builds/feral/druid/raid/overview/mythic/all-bosses
+    guardian: https://www.archon.gg/wow/builds/guardian/druid/raid/overview/mythic/all-bosses
+    restoration: https://www.archon.gg/wow/builds/restoration/druid/raid/overview/mythic/all-bosses
   evoker:
-    augmentation: https://www.wowhead.com/guide/classes/evoker/augmentation/overview-pve-dps
-    devestation: https://www.wowhead.com/guide/classes/evoker/devastation/overview-pve-dps
-    preservation: https://www.wowhead.com/guide/classes/evoker/preservation/overview-pve-healer
+    augmentation: https://www.archon.gg/wow/builds/augmentation/evoker/raid/overview/mythic/all-bosses
+    devestation: https://www.archon.gg/wow/builds/devastation/evoker/raid/overview/mythic/all-bosses
+    preservation: https://www.archon.gg/wow/builds/preservation/evoker/raid/overview/mythic/all-bosses
   hunter:
-    beast_mastery: https://www.wowhead.com/guide/classes/hunter/beast-mastery/overview-pve-dps
-    marksmanship: https://www.wowhead.com/guide/classes/hunter/marksmanship/overview-pve-dps
-    survival: https://www.wowhead.com/guide/classes/hunter/survival/overview-pve-dps
+    beast_mastery: https://www.archon.gg/wow/builds/beast-mastery/hunter/raid/overview/mythic/all-bosses
+    marksmanship: https://www.archon.gg/wow/builds/marksmanship/hunter/raid/overview/mythic/all-bosses
+    survival: https://www.archon.gg/wow/builds/survival/hunter/raid/overview/mythic/all-bosses
   mage:
-    arcane: https://www.wowhead.com/guide/classes/mage/arcane/overview-pve-dps
-    fire: https://www.wowhead.com/guide/classes/mage/fire/overview-pve-dps
-    frost: https://www.wowhead.com/guide/classes/mage/frost/overview-pve-dps
+    arcane: https://www.archon.gg/wow/builds/arcane/mage/raid/overview/mythic/all-bosses
+    fire: https://www.archon.gg/wow/builds/fire/mage/raid/overview/mythic/all-bosses
+    frost: https://www.archon.gg/wow/builds/frost/mage/raid/overview/mythic/all-bosses
   monk:
-    brewmaster: https://www.wowhead.com/guide/classes/monk/brewmaster/overview-pve-tank
-    mistweaver: https://www.wowhead.com/guide/classes/monk/mistweaver/overview-pve-healer
-    windwalker: https://www.wowhead.com/guide/classes/monk/windwalker/overview-pve-dps
+    brewmaster: https://www.archon.gg/wow/builds/brewmaster/monk/raid/overview/mythic/all-bosses
+    mistweaver: https://www.archon.gg/wow/builds/mistweaver/monk/raid/overview/mythic/all-bosses
+    windwalker: https://www.archon.gg/wow/builds/windwalker/monk/raid/overview/mythic/all-bosses
   paladin:
-    holy: https://www.wowhead.com/guide/classes/paladin/holy/overview-pve-healer
-    protection: https://www.wowhead.com/guide/classes/paladin/protection/overview-pve-tank
-    retribution: https://www.wowhead.com/guide/classes/paladin/retribution/overview-pve-dps
+    holy: https://www.archon.gg/wow/builds/holy/paladin/raid/overview/mythic/all-bosses
+    protection: https://www.archon.gg/wow/builds/protection/paladin/raid/overview/mythic/all-bosses
+    retribution: https://www.archon.gg/wow/builds/retribution/paladin/raid/overview/mythic/all-bosses
   priest:
-    discipline: https://www.wowhead.com/guide/classes/priest/discipline/overview-pve-healer
-    holy: https://www.wowhead.com/guide/classes/priest/holy/overview-pve-healer
-    shadow: https://www.wowhead.com/guide/classes/priest/shadow/overview-pve-dps
+    discipline: https://www.archon.gg/wow/builds/discipline/priest/raid/overview/mythic/all-bosses
+    holy: https://www.archon.gg/wow/builds/holy/priest/raid/overview/mythic/all-bosses
+    shadow: https://www.archon.gg/wow/builds/shadow/priest/raid/overview/mythic/all-bosses
   rouge:
-    assassionation: https://www.wowhead.com/guide/classes/rogue/assassination/overview-pve-dps
-    outlaw: https://www.wowhead.com/guide/classes/rogue/outlaw/overview-pve-dps
-    subtlety: https://www.wowhead.com/guide/classes/rogue/outlaw/overview-pve-dps
+    assassionation: https://www.archon.gg/wow/builds/assassination/rogue/raid/overview/mythic/all-bosses
+    outlaw: https://www.archon.gg/wow/builds/outlaw/rogue/raid/overview/mythic/all-bosses
+    subtlety: https://www.archon.gg/wow/builds/subtlety/rogue/raid/overview/mythic/all-bosses
   shaman:
-    elemental: https://www.wowhead.com/guide/classes/shaman/elemental/overview-pve-dps
-    enhancement: https://www.wowhead.com/guide/classes/shaman/enhancement/overview-pve-dps
-    restoration: https://www.wowhead.com/guide/classes/shaman/restoration/overview-pve-healer
+    elemental: https://www.archon.gg/wow/builds/elemental/shaman/raid/overview/mythic/all-bosses
+    enhancement: https://www.archon.gg/wow/builds/enhancement/shaman/raid/overview/mythic/all-bosses
+    restoration: https://www.archon.gg/wow/builds/restoration/shaman/raid/overview/mythic/all-bosses
   warlock:
-    affliction: https://www.wowhead.com/guide/classes/warlock/affliction/overview-pve-dps
-    demonology: https://www.wowhead.com/guide/classes/warlock/demonology/overview-pve-dps
-    destruction: https://www.wowhead.com/guide/classes/warlock/destruction/overview-pve-dps
+    affliction: https://www.archon.gg/wow/builds/affliction/warlock/raid/overview/mythic/all-bosses
+    demonology: https://www.archon.gg/wow/builds/demonology/warlock/raid/overview/mythic/all-bosses
+    destruction: https://www.archon.gg/wow/builds/destruction/warlock/raid/overview/mythic/all-bosses
   warrior:
-    arms: https://www.wowhead.com/guide/classes/warrior/arms/overview-pve-dps
-    fury: https://www.wowhead.com/guide/classes/warrior/fury/overview-pve-dps
-    protection: https://www.wowhead.com/guide/classes/warrior/protection/overview-pve-tank
+    arms: https://www.archon.gg/wow/builds/arms/warrior/raid/overview/mythic/all-bosses
+    fury: https://www.archon.gg/wow/builds/fury/warrior/raid/overview/mythic/all-bosses
+    protection: https://www.archon.gg/wow/builds/protection/warrior/raid/overview/mythic/all-bosses
 mplus:
   death_knight:
-    blood: https://www.wowhead.com/guide/classes/death-knight/blood/overview-pve-tank
-    frost: https://www.wowhead.com/guide/classes/death-knight/frost/overview-pve-dps
-    unholy: https://www.wowhead.com/guide/classes/death-knight/unholy/overview-pve-dps
+    blood: https://www.archon.gg/wow/builds/unholy/death-knight/mythic-plus/overview/10/all-dungeons/this-week
+    frost: https://www.archon.gg/wow/builds/frost/death-knight/mythic-plus/overview/10/all-dungeons/this-week
+    unholy: https://www.archon.gg/wow/builds/unholy/death-knight/mythic-plus/overview/10/all-dungeons/this-week
   demon_hunter:
-    devourer: # needs to be updated as soon as available
-    havoc: https://www.wowhead.com/guide/classes/death-knight/unholy/overview-pve-dps
-    Vengeance: https://www.wowhead.com/guide/classes/demon-hunter/vengeance/overview-pve-tank
+    devourer: https://www.archon.gg/wow/builds/devourer/demon-hunter/mythic-plus/overview/10/all-dungeons/this-week
+    havoc: https://www.archon.gg/wow/builds/havoc/demon-hunter/mythic-plus/overview/10/all-dungeons/this-week
+    Vengeance: https://www.archon.gg/wow/builds/vengeance/demon-hunter/mythic-plus/10/overview/all-dungeons/this-week
   druid:
-    balance: https://www.wowhead.com/guide/classes/druid/balance/overview-pve-dps
-    feral: https://www.wowhead.com/guide/classes/druid/balance/overview-pve-dps
-    guardian: https://www.wowhead.com/guide/classes/druid/guardian/overview-pve-tank
-    restoration: https://www.wowhead.com/guide/classes/druid/restoration/overview-pve-healer
+    balance: https://www.archon.gg/wow/builds/balance/druid/mythic-plus/overview/10/all-dungeons/this-week
+    feral: https://www.archon.gg/wow/builds/feral/druid/mythic-plus/overview/10/all-dungeons/this-week
+    guardian: https://www.archon.gg/wow/builds/guardian/druid/mythic-plus/overview/10/all-dungeons/this-week
+    restoration: https://www.archon.gg/wow/builds/restoration/druid/mythic-plus/overview/10/all-dungeons/this-week
   evoker:
-    augmentation: https://www.wowhead.com/guide/classes/evoker/augmentation/overview-pve-dps
-    devestation: https://www.wowhead.com/guide/classes/evoker/devastation/overview-pve-dps
-    preservation: https://www.wowhead.com/guide/classes/evoker/preservation/overview-pve-healer
+    augmentation: https://www.archon.gg/wow/builds/augmentation/evoker/mythic-plus/overview/10/all-dungeons/this-week
+    devestation: https://www.archon.gg/wow/builds/devastation/evoker/mythic-plus/overview/10/all-dungeons/this-week
+    preservation: https://www.archon.gg/wow/builds/preservation/evoker/mythic-plus/overview/10/all-dungeons/this-week
   hunter:
-    beast_mastery: https://www.wowhead.com/guide/classes/hunter/beast-mastery/overview-pve-dps
-    marksmanship: https://www.wowhead.com/guide/classes/hunter/marksmanship/overview-pve-dps
-    survival: https://www.wowhead.com/guide/classes/hunter/survival/overview-pve-dps
+    beast_mastery: https://www.archon.gg/wow/builds/beast-mastery/hunter/mythic-plus/overview/10/all-dungeons/this-week
+    marksmanship: https://www.archon.gg/wow/builds/marksmanship/hunter/mythic-plus/overview/10/all-dungeons/this-week
+    survival: https://www.archon.gg/wow/builds/survival/hunter/mythic-plus/overview/10/all-dungeons/this-week
   mage:
-    arcane: https://www.wowhead.com/guide/classes/mage/arcane/overview-pve-dps
-    fire: https://www.wowhead.com/guide/classes/mage/fire/overview-pve-dps
-    frost: https://www.wowhead.com/guide/classes/mage/frost/overview-pve-dps
+    arcane: https://www.archon.gg/wow/builds/arcane/mage/mythic-plus/overview/10/all-dungeons/this-week
+    fire: https://www.archon.gg/wow/builds/fire/mage/mythic-plus/overview/10/all-dungeons/this-week
+    frost: https://www.archon.gg/wow/builds/frost/mage/mythic-plus/overview/10/all-dungeons/this-week
   monk:
-    brewmaster: https://www.wowhead.com/guide/classes/monk/brewmaster/overview-pve-tank
-    mistweaver: https://www.wowhead.com/guide/classes/monk/mistweaver/overview-pve-healer
-    windwalker: https://www.wowhead.com/guide/classes/monk/windwalker/overview-pve-dps
+    brewmaster: https://www.archon.gg/wow/builds/brewmaster/monk/mythic-plus/overview/10/all-dungeons/this-week
+    mistweaver: https://www.archon.gg/wow/builds/windwalker/monk/mythic-plus/overview/10/all-dungeons/this-week
+    windwalker: https://www.archon.gg/wow/builds/windwalker/monk/mythic-plus/overview/10/all-dungeons/this-week
   paladin:
-    holy: https://www.wowhead.com/guide/classes/paladin/holy/overview-pve-healer
-    protection: https://www.wowhead.com/guide/classes/paladin/protection/overview-pve-tank
-    retribution: https://www.wowhead.com/guide/classes/paladin/retribution/overview-pve-dps
+    holy: https://www.archon.gg/wow/builds/holy/paladin/mythic-plus/overview/10/all-dungeons/this-week/
+    protection: https://www.archon.gg/wow/builds/protection/paladin/mythic-plus/overview/10/all-dungeons/this-week
+    retribution: https://www.archon.gg/wow/builds/retribution/paladin/mythic-plus/overview/10/all-dungeons/this-week
   priest:
-    discipline: https://www.wowhead.com/guide/classes/priest/discipline/overview-pve-healer
-    holy: https://www.wowhead.com/guide/classes/priest/holy/overview-pve-healer
-    shadow: https://www.wowhead.com/guide/classes/priest/shadow/overview-pve-dps
+    discipline: https://www.archon.gg/wow/builds/discipline/priest/mythic-plus/overview/10/all-dungeons/this-week
+    holy: https://www.archon.gg/wow/builds/holy/priest/mythic-plus/overview/10/all-dungeons/this-week
+    shadow: https://www.archon.gg/wow/builds/shadow/priest/mythic-plus/overview/10/all-dungeons/this-week
   rouge:
-    assassionation: https://www.wowhead.com/guide/classes/rogue/assassination/overview-pve-dps
-    outlaw: https://www.wowhead.com/guide/classes/rogue/outlaw/overview-pve-dps
-    subtlety: https://www.wowhead.com/guide/classes/rogue/outlaw/overview-pve-dps
+    assassionation: https://www.archon.gg/wow/builds/assassination/rogue/mythic-plus/overview/10/all-dungeons/this-week
+    outlaw: https://www.archon.gg/wow/builds/outlaw/rogue/mythic-plus/overview/10/all-dungeons/this-week
+    subtlety: https://www.archon.gg/wow/builds/subtlety/rogue/mythic-plus/overview/10/all-dungeons/this-week
   shaman:
-    elemental: https://www.wowhead.com/guide/classes/shaman/elemental/overview-pve-dps
-    enhancement: https://www.wowhead.com/guide/classes/shaman/enhancement/overview-pve-dps
-    restoration: https://www.wowhead.com/guide/classes/shaman/restoration/overview-pve-healer
+    elemental: https://www.archon.gg/wow/builds/elemental/shaman/mythic-plus/overview/10/all-dungeons/this-week
+    enhancement: https://www.archon.gg/wow/builds/enhancement/shaman/mythic-plus/overview/10/all-dungeons/this-week
+    restoration: https://www.archon.gg/wow/builds/restoration/shaman/mythic-plus/overview/10/all-dungeons/this-week
   warlock:
-    affliction: https://www.wowhead.com/guide/classes/warlock/affliction/overview-pve-dps
-    demonology: https://www.wowhead.com/guide/classes/warlock/demonology/overview-pve-dps
-    destruction: https://www.wowhead.com/guide/classes/warlock/destruction/overview-pve-dps
+    affliction: https://www.archon.gg/wow/builds/affliction/warlock/mythic-plus/overview/10/all-dungeons/this-week
+    demonology: https://www.archon.gg/wow/builds/demonology/warlock/mythic-plus/overview/10/all-dungeons/this-week
+    destruction: https://www.archon.gg/wow/builds/destruction/warlock/mythic-plus/overview/10/all-dungeons/this-week
   warrior:
-    arms: https://www.wowhead.com/guide/classes/warrior/arms/overview-pve-dps
-    fury: https://www.wowhead.com/guide/classes/warrior/fury/overview-pve-dps
-    protection: https://www.wowhead.com/guide/classes/warrior/protection/overview-pve-tank
+    arms: https://www.archon.gg/wow/builds/arms/warrior/mythic-plus/overview/10/all-dungeons/this-week
+    fury: https://www.archon.gg/wow/builds/fury/warrior/mythic-plus/overview/10/all-dungeons/this-week
+    protection: https://www.archon.gg/wow/builds/protection/warrior/mythic-plus/overview/10/all-dungeons/this-week

@@ -9,11 +9,6 @@ dependencies = [
     "PyYAML>=6.0.1",
 ]
 
-[project.optional-dependencies]
-dev = [
-    "ruff>=0.8.0",
-]
-
 [tool.ruff]
 # Set the maximum line length to 100 characters
 line-length = 100
@@ -53,3 +48,8 @@ quote-style = "double"
 
 # Indent with 4 spaces
 indent-style = "space"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.4",
+]
