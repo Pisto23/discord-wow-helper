@@ -39,7 +39,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.pydocstyle]
-# Use Google-style docstrings (matches your existing style)
+# Use Google-style docstringss
 convention = "google"
 
 [tool.ruff.lint.per-file-ignores]

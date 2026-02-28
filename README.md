@@ -4,9 +4,7 @@ A Discord bot for World of Warcraft that provides quick access to class guides, 
 
 ## Overview
 
-`discord-wow-helper` provides interactive slash commands with smart autocomplete to help WoW players quickly find guides and resources. The bot is driven by YAML mapping files in the `mappings/` folder which map class/spec combinations, dungeons, and bosses to external URLs (Wowhead, Icy Veins, MythicTrap, route links, etc.).
-
-Built with professional standards including comprehensive error handling, detailed logging and robust configuration validation.
+`discord-wow-helper` provides interactive slash commands with smart autocomplete to help WoW players quickly find guides and resources. The bot is driven by YAML mapping files in the `mappings/` folder which map class/spec combinations, dungeons, and bosses to external URLs (Wowhead, Icy Veins, MythicTrap, keystone.guru, archon.gg, etc.).
 
 ## Features
 
@@ -15,180 +13,152 @@ Built with professional standards including comprehensive error handling, detail
 - **Intelligent Autocomplete**: Filters classes, specs, dungeons, and bosses as you type
 - **Configurable Mappings**: Add or edit `mappings/*.yaml` to extend content without changing code
 - **Robust Error Handling**: Gracefully handles missing files, invalid YAML, and configuration errors
-- **Comprehensive Logging**: Detailed startup information and error tracking
+- **Containerized Deployment**: Docker image + Kubernetes manifest included
 
-## Expected mapping files
+## Mapping files
 
-The bot loads mapping files from the `mappings/` directory. By default it expects:
+The bot loads mapping files from the `mappings/` directory:
 
-- `guides.yaml` — maps classes and specs to Wowhead / Icy Veins guide URLs.
-- `mplus-routes.yaml` — maps dungeon slugs to route names and URLs.
-- `murloc.yaml` — optional mappings for Murloc class guides or single-entry items.
-- `raid.yaml` — maps raid boss slugs to names and MythicTrap (or other) URLs.
-
-If your YAML files use different names (for example `mplus.yaml` or `raids.yaml`), rename them to the expected filenames or update the code constants in [wow_helper_bot.py](wow_helper_bot.py).
+| File | Description |
+|---|---|
+| `guides.yaml` | (class, spec) → Wowhead / Icy Veins guide URLs |
+| `mplus-routes.yaml` | Dungeon slug → name + keystone.guru route URL |
+| `murloc.yaml` | (class, spec) → Murloc class guide URLs |
+| `raid.yaml` | Boss slug → name + MythicTrap guide URL |
+| `archon.yaml` | (class, spec) → archon.gg raid build URLs |
 
 ## Quick start
 
-1. Create a Python virtual environment and activate it:
+1. Install dependencies with [uv](https://github.com/astral-sh/uv):
 
    ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate
+   uv sync
    ```
 
-2. Install dependencies (this project uses `discord.py` and `PyYAML`):
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. Save your Discord bot token in a `.env` file placed in the project root. The file should use simple KEY=VALUE format (no quotes):
+2. Save your Discord bot token in a `.env` file in the project root:
 
    ```bash
    DISCORD_TOKEN=YOUR_BOT_TOKEN_HERE
    ```
 
-   **Important**: The bot validates that `DISCORD_TOKEN` is set on startup and will exit with a clear error message if missing.
+3. Ensure your `mappings/` directory contains the required YAML files.
 
-4. Ensure your `mappings/` directory contains the required YAML files (see "Expected mapping files" section above).
-
-5. Run the bot:
+4. Run the bot:
 
    ```bash
-   python3 wow_helper_bot.py
+   uv run python wow_helper_bot.py
    ```
 
-   The bot will:
+   On startup the bot validates configuration, loads all mapping files, syncs slash commands with Discord, and logs a summary of loaded entries.
 
-   - Validate configuration
-   - Load mapping files with detailed logging
-   - Connect to Discord
-   - Sync slash commands
-   - Begin responding to commands
+## Slash Commands
 
-   Check the console output for startup information including counts of loaded guides, routes, and bosses.
-
-## Slash Commands & Examples
+All commands also work with the `!` prefix for traditional text commands.
 
 ### `/guide <klasse> <spec>`
 
-Displays class and spec guides from Wowhead and Icy Veins.
+Displays class/spec guides from Wowhead and Icy Veins.
 
 - **Autocomplete**: Filters available classes and specs as you type
 - **Example**: `/guide paladin protection`
-- **Output**: Embedded message with guide links
 
 ### `/mplus <source> <item>`
 
 Shows Mythic+ route links or Murloc class guides.
 
 - **Source Options**:
-  - `routes` - Dungeon routes from mplus-routes.yaml
-  - `murloc` - Class guides from murloc.yaml
+  - `routes` — Dungeon routes from `mplus-routes.yaml`
+  - `murloc` — Class guides from `murloc.yaml`
 - **Autocomplete**: Dynamic filtering based on selected source
-- **Examples**:
-  - `/mplus routes hoa`
-  - `/mplus murloc paladin`
+- **Examples**: `/mplus routes hoa` · `/mplus murloc paladin`
 
 ### `/raid <boss>`
 
-Displays raid boss guide links.
+Displays a raid boss guide link from MythicTrap.
 
 - **Autocomplete**: Filters available bosses as you type
 - **Example**: `/raid dimensius`
-- **Output**: Embedded message with MythicTrap guide link
-
-All commands also work with the `!` prefix for traditional text commands (e.g., `!guide paladin protection`).
-
-## Configuration / extending mappings
-
-Open the YAML files in `mappings/` to add or update entries. The loader functions in `wow_helper_bot.py` document the expected structure (see the top of the file for details). After modifying mappings, restart the bot to pick up changes.
 
 ## Development
 
-### Project Structure
+### Project structure
 
-- **Entry point**: [wow_helper_bot.py](wow_helper_bot.py)
-- **Configuration**: `.env` file (DISCORD_TOKEN)
-- **Mappings**: `mappings/` directory (YAML files)
+```
+discord-wow-helper/
+├── wow_helper_bot.py   # Entry point — bot + cog
+├── pyproject.toml      # Dependencies and Ruff config
+├── Dockerfile
+├── deployment.yaml     # Kubernetes manifest
+├── .env                # DISCORD_TOKEN (not committed)
+└── mappings/
+    ├── guides.yaml
+    ├── mplus-routes.yaml
+    ├── murloc.yaml
+    ├── raid.yaml
+    └── archon.yaml
+```
 
-### Code Quality
+### Commands
 
-The codebase follows typical Python standards:
+```bash
+# Install dependencies
+uv sync
 
-- **Type Hints**: Full type annotations for all functions and methods
-- **Error Handling**: Comprehensive try/except blocks with informative logging
-- **Documentation**: Detailed docstrings following Google style
-- **Constants**: Centralized configuration keys to avoid magic strings
-- **Logging**: Structured logging with appropriate levels (INFO, WARNING, ERROR)
-- **Validation**: Startup checks for required configuration and files
+# Run
+uv run python wow_helper_bot.py
 
-### Key Components
+# Lint
+uv run ruff check .
 
-- **`WoWBot`**: Main bot class extending `commands.Bot`
-  - Handles setup and slash command synchronization
-  - Loads all mapping files on startup
+# Format check
+uv run ruff format --check .
 
-- **`WowHelper`**: Cog containing all commands and autocomplete logic
-  - Implements `/guide`, `/mplus`, `/raid` commands
-  - Provides dynamic autocomplete for all parameters
+# Auto-fix formatting
+uv run ruff format .
+```
 
-- **Data Loaders**:
-  - `safe_load_yaml()`: Safely loads YAML with error handling
-  - `load_guides()`: Parses guide mappings into indexed dictionaries
+### Code style
 
-### Running Tests
+- **Ruff** for linting and formatting (100-char line length, Python 3.11 target)
+- **Google-style docstrings**, double quotes, 4-space indentation
 
-To verify your setup:
+### Key components
 
-1. Check that all mapping files exist and are valid YAML
-2. Ensure DISCORD_TOKEN is set in `.env`
-3. Run the bot and verify startup logs show loaded data counts
-4. Test slash commands in Discord
+- **`WoWBot`** — `commands.Bot` subclass. `setup_hook()` loads all YAML files, registers the `WowHelper` cog, and syncs slash commands.
+- **`WowHelper`** — Cog containing all hybrid commands and their autocomplete handlers. The `/mplus` `item` autocomplete is context-aware and changes based on the selected `source`.
 
-### Extending the Bot
+### Extending the bot
 
 To add new commands:
 
 1. Create autocomplete functions in the `WowHelper` cog
 2. Define hybrid commands using `@commands.hybrid_command`
 3. Add `@app_commands.autocomplete` decorators for parameters
-4. Update YAML mappings as needed
+4. Update/add YAML mappings as needed
 
-## Error Handling
+## Deployment
 
-The bot includes comprehensive error handling:
+### Docker
 
-- **Missing Token**: Clear error message on startup if `DISCORD_TOKEN` not found
-- **Invalid YAML**: Logs warnings for missing or malformed mapping files
-- **Login Failures**: Catches and reports Discord authentication errors
-- **Missing Data**: Graceful responses when requested guides/routes don't exist
+```bash
+docker build -t wow-helper-bot .
+docker run -e DISCORD_TOKEN=your_token wow-helper-bot
+```
 
-All errors are logged with context to help diagnose issues quickly.
+### Kubernetes
 
-## Logging
+`deployment.yaml` contains a single-replica Deployment that reads `DISCORD_TOKEN` from a secret named `bot-token`:
 
-The bot provides detailed logging during operation:
-
-```text
-2026-01-31 12:00:00 | Loading mapping files...
-2026-01-31 12:00:00 | Loaded 36 Wowhead guides, 36 Icy Veins guides
-2026-01-31 12:00:00 | Loaded 8 M+ routes, 13 murloc entries
-2026-01-31 12:00:00 | Loaded 8 raid bosses
-2026-01-31 12:00:00 | Synchronizing slash commands with Discord...
-2026-01-31 12:00:00 | Synchronization complete!
-2026-01-31 12:00:01 | Starting WoW Discord bot...
+```bash
+kubectl create secret generic bot-token --from-literal=DISCORD_TOKEN=your_token
+kubectl apply -f deployment.yaml
 ```
 
 ## Contributing
 
-Contributions are welcome! When contributing:
-
-- Follow the existing code style with type hints and docstrings
-- Add error handling for new features
+- Follow the existing code style with type hints and Google-style docstrings
 - Update mapping files with clear slugs and full URLs
-- Test slash commands before submitting PRs
+- Test slash commands in Discord before submitting PRs
 
 ---
 
