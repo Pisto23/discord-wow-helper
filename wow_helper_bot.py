@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """WoW Discord helper bot.
 
-Provides slash and hybrid commands to fetch World of Warcraft guides,
+Provides slash commands to fetch World of Warcraft guides,
 Mythic+ routes, and raid boss information from YAML mapping files.
 
 This module defines a `WoWBot` (a subclass of `commands.Bot`) and a
@@ -107,21 +107,12 @@ def load_guides(
 
 # ---------- Bot class ----------
 class WoWBot(commands.Bot):
-    """Discord bot implementation that loads mappings and registers cogs.
-
-    The bot enables message content intents and uses a hybrid command
-    prefix for compatibility with both text and slash commands.
-    """
+    """Discord bot implementation that loads mappings and registers cogs."""
 
     def __init__(self):
-        """Initialize the WoW bot with message content intents and command prefix.
-
-        Sets up the bot with default Discord intents plus message_content enabled,
-        and configures the hybrid command prefix as "!".
-        """
+        """Initialize the WoW bot with default intents."""
         intents = discord.Intents.default()
-        intents.message_content = True
-        super().__init__(command_prefix="!", intents=intents)
+        super().__init__(command_prefix=commands.when_mentioned, intents=intents)
 
     async def setup_hook(self):
         """Asynchronous setup hook used by discord.py to prepare the bot.
@@ -173,7 +164,7 @@ class WoWBot(commands.Bot):
 
 
 class WowHelper(commands.Cog):
-    """Cog providing commands and autocompletes for WoW resources.
+    """Cog providing slash commands and autocompletes for WoW resources.
 
     The `data` argument must contain the mappings prepared in ``setup_hook``:
     keys: 'wowhead', 'icy', 'mplus_routes', 'murloc', 'raids'.
@@ -303,21 +294,24 @@ class WowHelper(commands.Cog):
 
     # --- Commands ---
 
-    @commands.hybrid_command(name="guide", description="Zeigt WoW Guides für Klasse und Spec")
+    @app_commands.command(name="guide", description="Zeigt WoW Guides für Klasse und Spec")
     @app_commands.describe(klasse="Wähle deine Klasse", spec="Wähle deine Spezialisierung")
     @app_commands.autocomplete(klasse=klasse_autocomplete, spec=spec_autocomplete)
-    async def guide(self, ctx: commands.Context, klasse: str, spec: str):
-        """Hybrid command to show guides for a given class and spec.
+    async def guide(self, interaction: discord.Interaction, klasse: str, spec: str):
+        """Show guides for a given class and spec.
 
-        Parameters reflect the user's chosen `klasse` and `spec` and the
-        function will reply with links found in the loaded mappings. If no
-        guide exists the user is informed.
+        Args:
+            interaction: The Discord interaction object.
+            klasse: The chosen WoW class.
+            spec: The chosen specialization.
         """
         k, s = klasse.lower(), spec.lower()
         key = (k, s)
         archon_url = self.data.get("archon", {}).get("raid", {}).get(k, {}).get(s)
         if key not in self.data["wowhead"] and key not in self.data["icy"] and not archon_url:
-            await ctx.send(f"Kein Guide für {klasse} {spec} gefunden.", ephemeral=True)
+            await interaction.response.send_message(
+                f"Kein Guide für {klasse} {spec} gefunden.", ephemeral=True
+            )
             return
 
         embed = discord.Embed(title=f"Guides: {k.title()} {s.title()}", color=discord.Color.blue())
@@ -339,9 +333,9 @@ class WowHelper(commands.Cog):
                 value=f"[Zum Guide]({archon_url})",
                 inline=False,
             )
-        await ctx.send(embed=embed, ephemeral=True)
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
-    @commands.hybrid_command(
+    @app_commands.command(
         name="mplus", description="Zeigt M+ Routes, Murloc Klassen oder Archon Builds"
     )
     @app_commands.describe(source="Wähle eine Quelle", item="Route, Klasse oder Dungeon")
@@ -353,35 +347,40 @@ class WowHelper(commands.Cog):
         ]
     )
     @app_commands.autocomplete(item=mplus_item_autocomplete)
-    async def mplus(self, ctx: commands.Context, source: str, item: str):
-        """Show either a Mythic+ route (from mplus-routes.yaml) or a Murloc class entry.
+    async def mplus(self, interaction: discord.Interaction, source: str, item: str):
+        """Show a Mythic+ route, a Murloc class entry, or an Archon M+ build.
 
-        /mplus asks for a source (routes or murloc) and then an item selected
-        from an autocomplete list for that source.
+        Args:
+            interaction: The Discord interaction object.
+            source: The data source to query (routes, murloc, or archon).
+            item: The dungeon slug, class name, or entry to look up.
         """
         src = str(source)
 
         if src == "routes":
-            # item is expected to be the dungeon slug (e.g. 'hoa'); try both raw and lowercased
             d_data = self.data.get("mplus_routes", {}).get(item) or self.data.get(
                 "mplus_routes", {}
             ).get((item or "").lower())
             if not d_data:
-                await ctx.send(f"Dungeon `{item}` nicht gefunden.", ephemeral=True)
+                await interaction.response.send_message(
+                    f"Dungeon `{item}` nicht gefunden.", ephemeral=True
+                )
                 return
             embed = discord.Embed(
                 title=f"M+ Route: {d_data.get('name', item)}",
                 color=discord.Color.green(),
             )
             embed.add_field(name="Route Link", value=f"[Hier klicken]({d_data.get('url', '')})")
-            await ctx.send(embed=embed, ephemeral=True)
+            await interaction.response.send_message(embed=embed, ephemeral=True)
             return
 
         if src == "murloc":
             murloc_data = self.data.get("murloc", {})
             c_data = murloc_data.get(item) or murloc_data.get((item or "").lower())
             if not c_data:
-                await ctx.send(f"Eintrag `{item}` nicht gefunden.", ephemeral=True)
+                await interaction.response.send_message(
+                    f"Eintrag `{item}` nicht gefunden.", ephemeral=True
+                )
                 return
 
             if isinstance(c_data, dict):
@@ -396,7 +395,7 @@ class WowHelper(commands.Cog):
                             embed.add_field(
                                 name=spec.title(), value=f"[Guide]({url})", inline=False
                             )
-                    await ctx.send(embed=embed, ephemeral=True)
+                    await interaction.response.send_message(embed=embed, ephemeral=True)
                     return
 
                 # Fallback: dict with 'name'/'url'
@@ -405,20 +404,22 @@ class WowHelper(commands.Cog):
                 embed = discord.Embed(title=f"Murloc: {name}", color=discord.Color.teal())
                 if url:
                     embed.add_field(name="Link", value=f"[Hier klicken]({url})")
-                await ctx.send(embed=embed, ephemeral=True)
+                await interaction.response.send_message(embed=embed, ephemeral=True)
                 return
 
             # Simple string entry
             name = str(c_data)
             embed = discord.Embed(title=f"Murloc: {name}", color=discord.Color.teal())
-            await ctx.send(embed=embed, ephemeral=True)
+            await interaction.response.send_message(embed=embed, ephemeral=True)
             return
 
         if src == "archon":
             archon_mplus = self.data.get("archon", {}).get("mplus", {})
             cls_data = archon_mplus.get(item) or archon_mplus.get((item or "").lower())
             if not cls_data:
-                await ctx.send(f"Klasse `{item}` nicht gefunden.", ephemeral=True)
+                await interaction.response.send_message(
+                    f"Klasse `{item}` nicht gefunden.", ephemeral=True
+                )
                 return
             embed = discord.Embed(
                 title=f"Archon.gg M+: {item.replace('_', ' ').title()}",
@@ -431,26 +432,30 @@ class WowHelper(commands.Cog):
                         value=f"[Archon.gg]({url})",
                         inline=False,
                     )
-            await ctx.send(embed=embed, ephemeral=True)
+            await interaction.response.send_message(embed=embed, ephemeral=True)
             return
 
-        await ctx.send("Ungültige Quelle gewählt.", ephemeral=True)
+        await interaction.response.send_message("Ungültige Quelle gewählt.", ephemeral=True)
 
-    @commands.hybrid_command(name="raid", description="Zeigt Boss-Infos aus dem Raid")
+    @app_commands.command(name="raid", description="Zeigt Boss-Infos aus dem Raid")
     @app_commands.describe(boss="Wähle den Boss")
     @app_commands.autocomplete(boss=raid_autocomplete)
-    async def raid(self, ctx: commands.Context, boss: str):
+    async def raid(self, interaction: discord.Interaction, boss: str):
         """Show raid boss information and a guide link for the chosen boss.
 
-        If the boss is unknown the user receives an ephemeral error message.
+        Args:
+            interaction: The Discord interaction object.
+            boss: The boss slug to look up.
         """
         b_data = self.data["raids"].get(boss.lower())
         if not b_data:
-            await ctx.send(f"Boss `{boss}` nicht gefunden.", ephemeral=True)
+            await interaction.response.send_message(
+                f"Boss `{boss}` nicht gefunden.", ephemeral=True
+            )
             return
         embed = discord.Embed(title=f"Raid Boss: {b_data['name']}", color=discord.Color.red())
         embed.add_field(name="Guide Link", value=f"[MythicTrap / Guide]({b_data['url']})")
-        await ctx.send(embed=embed, ephemeral=True)
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
 async def main():
