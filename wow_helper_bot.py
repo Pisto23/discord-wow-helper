@@ -339,7 +339,7 @@ class WowHelper(commands.Cog):
                 value=f"[Zum Guide]({archon_url})",
                 inline=False,
             )
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed, ephemeral=True)
 
     @commands.hybrid_command(
         name="mplus", description="Zeigt M+ Routes, Murloc Klassen oder Archon Builds"
@@ -374,7 +374,7 @@ class WowHelper(commands.Cog):
                 color=discord.Color.green(),
             )
             embed.add_field(name="Route Link", value=f"[Hier klicken]({d_data.get('url', '')})")
-            await ctx.send(embed=embed)
+            await ctx.send(embed=embed, ephemeral=True)
             return
 
         if src == "murloc":
@@ -396,7 +396,7 @@ class WowHelper(commands.Cog):
                             embed.add_field(
                                 name=spec.title(), value=f"[Guide]({url})", inline=False
                             )
-                    await ctx.send(embed=embed)
+                    await ctx.send(embed=embed, ephemeral=True)
                     return
 
                 # Fallback: dict with 'name'/'url'
@@ -405,13 +405,13 @@ class WowHelper(commands.Cog):
                 embed = discord.Embed(title=f"Murloc: {name}", color=discord.Color.teal())
                 if url:
                     embed.add_field(name="Link", value=f"[Hier klicken]({url})")
-                await ctx.send(embed=embed)
+                await ctx.send(embed=embed, ephemeral=True)
                 return
 
             # Simple string entry
             name = str(c_data)
             embed = discord.Embed(title=f"Murloc: {name}", color=discord.Color.teal())
-            await ctx.send(embed=embed)
+            await ctx.send(embed=embed, ephemeral=True)
             return
 
         if src == "archon":
@@ -431,7 +431,7 @@ class WowHelper(commands.Cog):
                         value=f"[Archon.gg]({url})",
                         inline=False,
                     )
-            await ctx.send(embed=embed)
+            await ctx.send(embed=embed, ephemeral=True)
             return
 
         await ctx.send("Ungültige Quelle gewählt.", ephemeral=True)
@@ -450,7 +450,7 @@ class WowHelper(commands.Cog):
             return
         embed = discord.Embed(title=f"Raid Boss: {b_data['name']}", color=discord.Color.red())
         embed.add_field(name="Guide Link", value=f"[MythicTrap / Guide]({b_data['url']})")
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed, ephemeral=True)
 
 
 async def main():
