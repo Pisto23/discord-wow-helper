@@ -9,7 +9,6 @@ A Discord bot for World of Warcraft that provides quick access to class guides, 
 ## Features
 
 - **Slash Commands**: `/guide`, `/mplus`, `/raid` with smart autocomplete
-- **Hybrid Commands**: Works as both slash commands and traditional text commands with `!` prefix
 - **Intelligent Autocomplete**: Filters classes, specs, dungeons, and bosses as you type
 - **Configurable Mappings**: Add or edit `mappings/*.yaml` to extend content without changing code
 - **Robust Error Handling**: Gracefully handles missing files, invalid YAML, and configuration errors
@@ -50,10 +49,6 @@ The bot loads mapping files from the `mappings/` directory:
    ```
 
    On startup the bot validates configuration, loads all mapping files, syncs slash commands with Discord, and logs a summary of loaded entries.
-
-## Slash Commands
-
-All commands also work with the `!` prefix for traditional text commands.
 
 ### `/guide <klasse> <spec>`
 
