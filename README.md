@@ -50,6 +50,8 @@ The bot loads mapping files from the `mappings/` directory:
 
    On startup the bot validates configuration, loads all mapping files, syncs slash commands with Discord, and logs a summary of loaded entries.
 
+## Slash Commands
+
 ### `/guide <klasse> <spec>`
 
 Displays class/spec guides from Wowhead and Icy Veins.
