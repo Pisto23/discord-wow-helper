@@ -305,6 +305,10 @@ class WowHelper(commands.Cog):
             klasse: The chosen WoW class.
             spec: The chosen specialization.
         """
+        logger.info(
+            f"/guide | user={interaction.user} | guild={interaction.guild} "
+            f"| channel={interaction.channel} | klasse={klasse} | spec={spec}"
+        )
         k, s = klasse.lower(), spec.lower()
         key = (k, s)
         archon_url = self.data.get("archon", {}).get("raid", {}).get(k, {}).get(s)
@@ -355,6 +359,10 @@ class WowHelper(commands.Cog):
             source: The data source to query (routes, murloc, or archon).
             item: The dungeon slug, class name, or entry to look up.
         """
+        logger.info(
+            f"/mplus | user={interaction.user} | guild={interaction.guild} "
+            f"| channel={interaction.channel} | source={source} | item={item}"
+        )
         src = str(source)
 
         if src == "routes":
@@ -447,6 +455,10 @@ class WowHelper(commands.Cog):
             interaction: The Discord interaction object.
             boss: The boss slug to look up.
         """
+        logger.info(
+            f"/raid | user={interaction.user} | guild={interaction.guild} "
+            f"| channel={interaction.channel} | boss={boss}"
+        )
         b_data = self.data["raids"].get(boss.lower())
         if not b_data:
             await interaction.response.send_message(
