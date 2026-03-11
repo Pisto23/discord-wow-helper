@@ -1,26 +1,23 @@
-bosses:
-  # ToDo: regarding mythictrap; maybe better solutiun we will see.
-  plexus:
-    name: Plexus Sentinel
-    url: https://www.mythictrap.com/de/manaforge-omega/plexus-sentinel
-  loom:
-    name: Loom'ithar
-    url: https://www.mythictrap.com/de/manaforge-omega/loomithar
-  soulbinder:
-    name: Soulbinder Naazindhri
-    url: https://www.mythictrap.com/de/manaforge-omega/soulbinder-naazindhri
-  araz:
-    name: Forgeweaver Araz
-    url: https://www.mythictrap.com/de/manaforge-omega/forgeweaver-araz
-  soul_hunters:
-    name: The Soul Hunters
-    url: https://www.mythictrap.com/de/manaforge-omega/the-soul-hunters
-  fractilus:
-    name: Fractilus
-    url: https://www.mythictrap.com/de/manaforge-omega/fractillus
-  nexus_king:
-    name:  Nexus King Salhadaar
-    url: https://www.mythictrap.com/de/manaforge-omega/nexus-king-salhadaar
-  dimensius:
-    name: Dimensius, the All-Devouring
-    url: https://www.mythictrap.com/de/manaforge-omega/dimensius-the-all-devouring
+fullguide:
+  bosses:
+    all:
+      name: Every Raid Boss in Midnight Season 1
+      url: https://www.youtube.com/watch?v=kIokWz6RUrw
+voidspire:
+  bosses:
+    fullguide:
+      name: Full guide until single guides are available
+      url: https://www.youtube.com/watch?v=nzjoZIM4Zs4
+queldanas:
+  bosses:
+    beloren:
+      name: Belo'ren, Child of Al'ra
+      url: https://www.youtube.com/watch?v=OqTQGpJCvuc
+    Midnight_Falls:
+      name: Mightnight Falls
+      url: '!!Coming soon!!'
+dreamrift:
+  bosses:
+    chimaerus:
+      name: Chimaerus
+      url: https://www.youtube.com/watch?v=t1gs0awyzIk

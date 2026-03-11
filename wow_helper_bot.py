@@ -144,7 +144,7 @@ class WoWBot(commands.Bot):
             "icy": iv,
             "mplus_routes": mplus_routes,
             "murloc": murloc,
-            "raids": safe_load_yaml(MAPPINGS_DIR / "raid.yaml").get(KEY_BOSSES, {}),
+            "raids": safe_load_yaml(MAPPINGS_DIR / "raid.yaml"),
             "archon": archon_data,
         }
 
@@ -154,7 +154,8 @@ class WoWBot(commands.Bot):
             f"Loaded {len(archon_data['raid'])} archon raid classes, "
             f"{len(archon_data['mplus'])} archon M+ classes"
         )
-        logger.info(f"Loaded {len(data['raids'])} raid bosses")
+        total_bosses = sum(len(r.get("bosses", {})) for r in data["raids"].values())
+        logger.info(f"Loaded {len(data['raids'])} raids with {total_bosses} bosses")
 
         await self.add_cog(WowHelper(self, data))
 
@@ -231,11 +232,25 @@ class WowHelper(commands.Cog):
     async def raid_autocomplete(
         self, interaction: discord.Interaction, current: str
     ) -> list[app_commands.Choice[str]]:
-        """Autocomplete for raid bosses by name or slug."""
+        """Autocomplete for raid names (top-level keys in raid.yaml)."""
         return [
-            app_commands.Choice(name=b["name"], value=slug)
-            for slug, b in self.data["raids"].items()
-            if current.lower() in b["name"].lower() or current.lower() in slug.lower()
+            app_commands.Choice(name=slug.title(), value=slug)
+            for slug in self.data["raids"].keys()
+            if current.lower() in slug.lower()
+        ][:25]
+
+    async def boss_autocomplete(
+        self, interaction: discord.Interaction, current: str
+    ) -> list[app_commands.Choice[str]]:
+        """Autocomplete for boss slugs filtered by the selected raid."""
+        raid_slug = interaction.namespace.raid
+        if not raid_slug:
+            return []
+        bosses = self.data["raids"].get(raid_slug, {}).get("bosses", {})
+        return [
+            app_commands.Choice(name=b.get("name") or slug, value=slug)
+            for slug, b in bosses.items()
+            if current.lower() in (b.get("name") or slug).lower() or current.lower() in slug.lower()
         ][:25]
 
     async def murloc_autocomplete(
@@ -446,27 +461,29 @@ class WowHelper(commands.Cog):
         await interaction.response.send_message("Ungültige Quelle gewählt.", ephemeral=True)
 
     @app_commands.command(name="raid", description="Zeigt Boss-Infos aus dem Raid")
-    @app_commands.describe(boss="Wähle den Boss")
-    @app_commands.autocomplete(boss=raid_autocomplete)
-    async def raid(self, interaction: discord.Interaction, boss: str):
+    @app_commands.describe(raid="Wähle den Raid", boss="Wähle den Boss")
+    @app_commands.autocomplete(raid=raid_autocomplete, boss=boss_autocomplete)
+    async def raid(self, interaction: discord.Interaction, raid: str, boss: str):
         """Show raid boss information and a guide link for the chosen boss.
 
         Args:
             interaction: The Discord interaction object.
+            raid: The raid slug to look up.
             boss: The boss slug to look up.
         """
         logger.info(
             f"/raid | user={interaction.user} | guild={interaction.guild} "
-            f"| channel={interaction.channel} | boss={boss}"
+            f"| channel={interaction.channel} | raid={raid} | boss={boss}"
         )
-        b_data = self.data["raids"].get(boss.lower())
+        bosses = self.data["raids"].get(raid, {}).get("bosses", {})
+        b_data = bosses.get(boss)
         if not b_data:
             await interaction.response.send_message(
                 f"Boss `{boss}` nicht gefunden.", ephemeral=True
             )
             return
         embed = discord.Embed(title=f"Raid Boss: {b_data['name']}", color=discord.Color.red())
-        embed.add_field(name="Guide Link", value=f"[MythicTrap / Guide]({b_data['url']})")
+        embed.add_field(name="Guide Link", value=f"[Youtube / Guide]({b_data['url']})")
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
