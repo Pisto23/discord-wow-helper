@@ -20,6 +20,7 @@ import logging
 import os
 from pathlib import Path
 
+import aiohttp
 import discord
 import yaml
 from discord import app_commands
@@ -29,6 +30,14 @@ from dotenv import load_dotenv
 # Configuration
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
+
+# Vars for rio cmd
+
+RIO_GUILD_NAME = os.getenv("RIO_GUILD_NAME", "")
+RIO_REALM = os.getenv("RIO_REALM", "")
+RIO_REGION = os.getenv("RIO_REGION", "")
+RIO_API_BASE = "https://raider.io/api/v1"
+
 
 if not TOKEN:
     raise ValueError(
@@ -113,6 +122,7 @@ class WoWBot(commands.Bot):
         """Initialize the WoW bot with default intents."""
         intents = discord.Intents.default()
         super().__init__(command_prefix=commands.when_mentioned, intents=intents)
+        self.session: aiohttp.ClientSession | None = None
 
     async def setup_hook(self):
         """Asynchronous setup hook used by discord.py to prepare the bot.
@@ -121,6 +131,9 @@ class WoWBot(commands.Bot):
         application (slash) commands with Discord.
         """
         logger.info("Loading mapping files...")
+
+        # Rio
+        self.session = aiohttp.ClientSession()
 
         # Load mapping data
         wh, iv = load_guides(MAPPINGS_DIR / "guides.yaml")
@@ -158,10 +171,18 @@ class WoWBot(commands.Bot):
         logger.info(f"Loaded {len(data['raids'])} raids with {total_bosses} bosses")
 
         await self.add_cog(WowHelper(self, data))
+        await self.add_cog(RioCog(self))
 
         logger.info("Synchronizing slash commands with Discord...")
         await self.tree.sync()
         logger.info("Synchronization complete!")
+
+    async def close(self):
+        """Clean up the aiohttp session when the bot process exits."""
+        if self.session and not self.session.closed:
+            await self.session.close()
+            logger.info("aiohttp session closed.")
+        await super().close()
 
 
 class WowHelper(commands.Cog):
@@ -485,6 +506,147 @@ class WowHelper(commands.Cog):
         embed = discord.Embed(title=f"Raid Boss: {b_data['name']}", color=discord.Color.red())
         embed.add_field(name="Guide Link", value=f"[Youtube / Guide]({b_data['url']})")
         await interaction.response.send_message(embed=embed, ephemeral=True)
+
+
+class RioCog(commands.Cog):
+    """Cog providing the /rio slash command to display guild M+ leaderboards."""
+
+    def __init__(self, bot):
+        """Initialize the RioCog with the bot instance.
+
+        Args:
+            bot: The Discord bot instance this cog is attached to.
+        """
+        self.bot = bot
+
+    async def fetch_char_score(
+        self,
+        session: aiohttp.ClientSession,
+        name: str,
+        semaphore: asyncio.Semaphore,
+    ) -> tuple:
+        """Holt den Score für einen einzelnen Charakter mit Rate-Limiting."""
+        url = (
+            f"{RIO_API_BASE}/characters/profile"
+            f"?region={RIO_REGION}"
+            f"&realm={RIO_REALM}"
+            f"&name={name}"
+            f"&fields=mythic_plus_scores_by_season:current"
+        )
+
+        async with semaphore:
+            try:
+                async with session.get(url, timeout=aiohttp.ClientTimeout(total=5)) as resp:
+                    if resp.status == 200:
+                        data = await resp.json()
+                        seasons = data.get("mythic_plus_scores_by_season", [])
+                        char_class = data.get("class", "Unknown")
+                        score = seasons[0]["scores"]["all"] if seasons else 0.0
+                        return (score, name, char_class)
+            except Exception as e:
+                logger.debug(f"Fehler beim Abrufen von {name}: {e}")
+
+        return (0.0, name, "Unknown")
+
+    @app_commands.command(
+        name="rio", description="Zeigt die Top 10 M+ Scores der Gilde von Raider.io"
+    )
+    async def rio(self, interaction: discord.Interaction) -> None:
+        """Fetch and display the top 10 M+ scores for the configured guild.
+
+        Args:
+            interaction: The Discord interaction object.
+        """
+        logger.info(
+            f"/rio | user={interaction.user} | guild={interaction.guild} "
+            f"| channel= {interaction.channel}"
+        )
+
+        if not RIO_GUILD_NAME or not RIO_REALM:
+            await interaction.response.send_message(
+                "Gildenkonfiguration fehlt. Bitte `RIO_GUILD_NAME` und"
+                " `RIO_REALM` in `.env` setzen.",
+                ephemeral=True,
+            )
+            return
+
+        await interaction.response.defer(ephemeral=True)
+
+        guild_url = (
+            f"{RIO_API_BASE}/guilds/profile"
+            f"?region={RIO_REGION}"
+            f"&realm={RIO_REALM}"
+            f"&name={RIO_GUILD_NAME}"
+            f"&fields=members"
+        )
+
+        try:
+            timeout = aiohttp.ClientTimeout(total=10)
+            async with self.bot.session.get(guild_url, timeout=timeout) as resp:
+                if resp.status == 400:
+                    await interaction.followup.send(
+                        "Gilde nicht gefunden. Bitte Konfiguration prüfen.",
+                        ephemeral=True,
+                    )
+                    return
+                if resp.status != 200:
+                    await interaction.followup.send(
+                        f"Raider.io API Fehler (HTTP {resp.status}). Bitte später versuchen.",
+                        ephemeral=True,
+                    )
+                    return
+                guild_data = await resp.json()
+        except aiohttp.ClientError as exc:
+            logger.error(f"/rio | aiohttp error: {exc}")
+            await interaction.followup.send(
+                "Netzwerkfehler beim Abrufen der Raider.io Daten.", ephemeral=True
+            )
+            return
+
+        members = guild_data.get("members", [])
+
+        # IMPORTANT: Limitation!
+        # If the guild has 500 members, this will exceed Raider.IO's request limit.
+        # Filter to the first 100 roster entries to stay within bounds.
+        members = members[:100]
+
+        if not members:
+            await interaction.followup.send(
+                "Die Gilde hat scheinbar keine Mitglieder.", ephemeral=True
+            )
+            return
+
+        semaphore = asyncio.Semaphore(10)
+
+        tasks = [
+            self.fetch_char_score(self.bot.session, entry["character"]["name"], semaphore)
+            for entry in members
+            if "character" in entry
+        ]
+
+        scored = await asyncio.gather(*tasks)
+
+        scored.sort(key=lambda x: x[0], reverse=True)
+        top10 = [x for x in scored if x[0] > 0][:10]  # Only ppls with > 0 Score
+
+        guild_display = guild_data.get("name", RIO_GUILD_NAME)
+        embed = discord.Embed(
+            title=f"Raider.io M+ Top 10 - {guild_display}",
+            color=discord.Color.gold(),
+        )
+        embed.set_footer(text=f"Region: {RIO_REGION.upper()} | Realm: {RIO_REALM.title()}")
+
+        if not top10:
+            embed.description = "Keine Scores (oder nur 0.0) in der Gilde gefunden."
+        else:
+            lines = []
+            for rank, (score, name, char_class) in enumerate(top10, start=1):
+                score_str = f"{score:.1f}"
+                class_label = f"({char_class})" if char_class else ""
+                lines.append(f"`{rank:>2}.` **{name}** {class_label} - {score_str}")
+            embed.description = "\n".join(lines)
+
+        await interaction.followup.send(embed=embed, ephemeral=True)
 
 
 async def main():

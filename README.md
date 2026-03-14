@@ -8,7 +8,7 @@ A Discord bot for World of Warcraft that provides quick access to class guides, 
 
 ## Features
 
-- **Slash Commands**: `/guide`, `/mplus`, `/raid` with smart autocomplete
+- **Slash Commands**: `/guide`, `/mplus`, `/raid`, `/rio` with smart autocomplete
 - **Intelligent Autocomplete**: Filters classes, specs, dungeons, and bosses as you type
 - **Configurable Mappings**: Add or edit `mappings/*.yaml` to extend content without changing code
 - **Robust Error Handling**: Gracefully handles missing files, invalid YAML, and configuration errors
@@ -19,7 +19,7 @@ A Discord bot for World of Warcraft that provides quick access to class guides, 
 The bot loads mapping files from the `mappings/` directory:
 
 | File | Description |
-|---|---|
+| --- | --- |
 | `guides.yaml` | (class, spec) → Wowhead / Icy Veins guide URLs |
 | `mplus-routes.yaml` | Dungeon slug → name + keystone.guru route URL |
 | `murloc.yaml` | (class, spec) → Murloc class guide URLs |
@@ -34,10 +34,14 @@ The bot loads mapping files from the `mappings/` directory:
    uv sync
    ```
 
-2. Save your Discord bot token in a `.env` file in the project root:
+2. Save your Discord bot token and guild config in a `.env` file in the project root:
 
    ```bash
    DISCORD_TOKEN=YOUR_BOT_TOKEN_HERE
+
+   RIO_GUILD_NAME=YourGuildName
+   RIO_REALM=your-realm
+   RIO_REGION=eu
    ```
 
 3. Ensure your `mappings/` directory contains the required YAML files.
@@ -69,18 +73,25 @@ Shows Mythic+ route links or Murloc class guides.
 - **Autocomplete**: Dynamic filtering based on selected source
 - **Examples**: `/mplus routes hoa` · `/mplus murloc paladin`
 
-### `/raid <boss>`
+### `/raid <raid> <boss>`
 
 Displays a raid boss guide link from MythicTrap.
 
-- **Autocomplete**: Filters available bosses as you type
-- **Example**: `/raid dimensius`
+- **Autocomplete**: Filters raids and bosses as you type
+- **Example**: `/raid voidspire dimensius`
+
+### `/rio`
+
+Fetches the current season M+ scores for all guild members from [raider.io](https://raider.io) and displays a top 10 leaderboard.
+
+- **No parameters** — guild is configured via `.env` (`RIO_GUILD_NAME`, `RIO_REALM`, `RIO_REGION`)
+- **Example**: `/rio`
 
 ## Development
 
 ### Project structure
 
-```
+```text
 discord-wow-helper/
 ├── wow_helper_bot.py   # Entry point — bot + cog
 ├── pyproject.toml      # Dependencies and Ruff config
@@ -121,25 +132,30 @@ uv run ruff format .
 
 ### Key components
 
-- **`WoWBot`** — `commands.Bot` subclass. `setup_hook()` loads all YAML files, registers the `WowHelper` cog, and syncs slash commands.
-- **`WowHelper`** — Cog containing all hybrid commands and their autocomplete handlers. The `/mplus` `item` autocomplete is context-aware and changes based on the selected `source`.
+- **`WoWBot`** — `commands.Bot` subclass. `setup_hook()` loads all YAML files, registers both cogs, manages the `aiohttp` session lifecycle, and syncs slash commands.
+- **`WowHelper`** — Cog containing `/guide`, `/mplus`, and `/raid` with their autocomplete handlers. The `/mplus` `item` autocomplete is context-aware and changes based on the selected `source`.
+- **`RioCog`** — Cog containing `/rio`. Makes live requests to the raider.io API to fetch guild member M+ scores and returns a top 10 leaderboard.
 
 ### Extending the bot
 
 To add new commands:
 
 1. Create autocomplete functions in the `WowHelper` cog
-2. Define hybrid commands using `@commands.hybrid_command`
-3. Add `@app_commands.autocomplete` decorators for parameters
-4. Update/add YAML mappings as needed
+2. Add `@app_commands.autocomplete` decorators for parameters
+3. Update/add YAML mappings as needed
 
-## Deployment
+## Deployment [Just a Playground ;) ]
 
 ### Docker
 
 ```bash
 docker build -t wow-helper-bot .
-docker run -e DISCORD_TOKEN=your_token wow-helper-bot
+docker run \
+  -e DISCORD_TOKEN=your_token \
+  -e RIO_GUILD_NAME=YourGuildName \
+  -e RIO_REALM=your-realm \
+  -e RIO_REGION=eu \
+  wow-helper-bot
 ```
 
 ### Kubernetes
