@@ -504,7 +504,7 @@ class WowHelper(commands.Cog):
             )
             return
         embed = discord.Embed(title=f"Raid Boss: {b_data['name']}", color=discord.Color.red())
-        embed.add_field(name="Guide Link", value=f"[Youtube / Guide]({b_data['url']})")
+        embed.add_field(name="Mythictrap Link", value=f"[{b_data['name']}]({b_data['url']})")
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
