@@ -524,12 +524,14 @@ class RioCog(commands.Cog):
         session: aiohttp.ClientSession,
         name: str,
         semaphore: asyncio.Semaphore,
+        realm: str = "",
     ) -> tuple:
         """Holt den Score für einen einzelnen Charakter mit Rate-Limiting."""
+        char_realm = realm or RIO_REALM
         url = (
             f"{RIO_API_BASE}/characters/profile"
             f"?region={RIO_REGION}"
-            f"&realm={RIO_REALM}"
+            f"&realm={char_realm}"
             f"&name={name}"
             f"&fields=mythic_plus_scores_by_season:current"
         )
@@ -619,7 +621,12 @@ class RioCog(commands.Cog):
         semaphore = asyncio.Semaphore(10)
 
         tasks = [
-            self.fetch_char_score(self.bot.session, entry["character"]["name"], semaphore)
+            self.fetch_char_score(
+                self.bot.session,
+                entry["character"]["name"],
+                semaphore,
+                realm=entry["character"].get("realm", ""),
+            )
             for entry in members
             if "character" in entry
         ]
